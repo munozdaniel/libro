@@ -9,10 +9,13 @@ class IndexController extends ControllerBase
 
     }
 
+    /**
+     * Solicita el inicio de sesión.
+     */
     public function indexAction()
     {
         $this->tag->setTitle('Inicio');
-
+        $this->view->cleanTemplateAfter();
     }
 
 }
