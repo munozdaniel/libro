@@ -85,19 +85,8 @@
         <!-- /.sidebar -->
     </aside>
     <!-- =============================================== -->
-
-    <!-- Content Wrapper. Contains page content -->
-    <div class="content-wrapper">
-
-
-        <!-- Main content -->
-        <section class="content">
-            {{ content() }}
-        </section>
-        <!-- /.content -->
-    </div>
-    <!-- /.content-wrapper -->
-
+    {{ content() }}
+    <!-- =============================================== -->
     <footer class="main-footer">
         <div class="pull-right hidden-xs">
             <b>Version</b> 3.0
