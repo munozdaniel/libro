@@ -29,7 +29,7 @@
     {{ javascript_include('dist/js/app.min.js') }}
     {{ javascript_include('dist/js/demo.js') }}
     {% if (assets.collection("footerJs")) %}
-        {{ assets.outputJs("footer") }}
+        {{ assets.outputJs("footerJs") }}
     {% endif %}
     {% if (assets.collection("footerInlineJs")) %}
         {{ assets.outputInlineJs("footerInlineJs") }}
