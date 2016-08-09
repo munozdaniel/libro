@@ -46,6 +46,7 @@ $di->setShared('view', function () use ($config) {
                 'compiledPath' => $config->application->cacheDir,
                 'compiledSeparator' => '_'
             ));
+            $volt->getCompiler()->addFilter('strtotime', 'strtotime');
 
             return $volt;
         },
@@ -61,14 +62,41 @@ $di->setShared('view', function () use ($config) {
 $di->set('db', function () use ($config) {
     return new DbAdapter($config->database->toArray());
 });
+//GESTIONUSUARIOS
+$di->set('dbUsuarios', function () use ($config) {
+    return new DbAdapter($config->gestionusuarios->toArray());
 
+});
 /**
  * If the configuration specify the use of metadata adapter use it or use memory otherwise
  */
 $di->set('modelsMetadata', function () {
     return new MetaDataAdapter();
 });
-
+/**
+ * Register the flash service with custom CSS classes
+ */
+$di->set('flash', function()
+{
+    return new Phalcon\Flash\Direct(array(
+        'error'     => 'alert alert-danger',
+        'success'   => 'alert alert-success',
+        'notice'    => 'alert alert-info ',
+        'warning'   => 'alert alert-warning ',
+    ));
+});
+/**
+ * Register the flash service with custom CSS classes
+ */
+$di->set('flashSession', function()
+{
+    return new Phalcon\Flash\Session(array(
+        'error'     => 'alert alert-danger',
+        'success'   => 'alert alert-success',
+        'notice'    => 'alert alert-info ',
+        'warning'   => 'alert alert-warning ',
+    ));
+});
 /**
  * Start the session the first time some component request the session service
  */
@@ -77,4 +105,10 @@ $di->setShared('session', function () {
     $session->start();
 
     return $session;
+});
+/**
+ * Register a user component
+ */
+$di->set('elements', function(){
+    return new Entorno\Elements();
 });
