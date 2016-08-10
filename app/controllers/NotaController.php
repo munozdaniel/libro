@@ -1,5 +1,5 @@
 <?php
- 
+
 use Phalcon\Mvc\Model\Criteria;
 use Phalcon\Paginator\Adapter\Model as Paginator;
 
@@ -19,7 +19,29 @@ class NotaController extends ControllerBase
      */
     public function searchAction()
     {
+        $this->assets->collection('headerCss')
+            ->addCss('plugins/datatables/dataTables.bootstrap.css');
+        $this->assets->collection('footerJs')
+            ->addJs('plugins/datatables/jquery.dataTables.min.js')
+            ->addJs('plugins/datatables/dataTables.bootstrap.min.js');
+        $this->assets->collection('footerInlineJs')
+            ->addInlineJs('
+                        $(function () {
+                            var table = $(\'#tabla\').DataTable({
+                                paging: true,
+                                lengthChange: false,
+                                searching: false,
+                                ordering: true,
+                                info: true,
+                                autoWidth: true,
+                                scrollX: true,
+                                scrollCollapse: true,
+                                fixedColumns: true,
+                                paging: false,
 
+                            });
+                        });
+            ');
         $numberPage = 1;
         if ($this->request->isPost()) {
             $query = Criteria::fromInput($this->di, "Nota", $_POST);
@@ -46,7 +68,7 @@ class NotaController extends ControllerBase
 
         $paginator = new Paginator(array(
             "data" => $nota,
-            "limit"=> 10,
+            "limit" => 10,
             "page" => $numberPage
         ));
 
@@ -102,7 +124,7 @@ class NotaController extends ControllerBase
             $this->tag->setDefault("nota_ultimaModificacion", $nota->getNotaUltimamodificacion());
             $this->tag->setDefault("nota_sectorOrigenId", $nota->getNotaSectororigenid());
             $this->tag->setDefault("nota_adjunto", $nota->getNotaAdjunto());
-            
+
         }
     }
 
@@ -139,7 +161,7 @@ class NotaController extends ControllerBase
         $nota->setNotaUltimamodificacion($this->request->getPost("nota_ultimaModificacion"));
         $nota->setNotaSectororigenid($this->request->getPost("nota_sectorOrigenId"));
         $nota->setNotaAdjunto($this->request->getPost("nota_adjunto"));
-        
+
 
         if (!$nota->save()) {
             foreach ($nota->getMessages() as $message) {
@@ -205,7 +227,7 @@ class NotaController extends ControllerBase
         $nota->setNotaUltimamodificacion($this->request->getPost("nota_ultimaModificacion"));
         $nota->setNotaSectororigenid($this->request->getPost("nota_sectorOrigenId"));
         $nota->setNotaAdjunto($this->request->getPost("nota_adjunto"));
-        
+
 
         if (!$nota->save()) {
 
