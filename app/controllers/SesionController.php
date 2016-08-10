@@ -33,12 +33,12 @@ class SesionController extends ControllerBase
                 if ($usuarios != false) {
                     if ($this->_registrarSesion($usuarios)) {
                         $miSesion = $this->session->get('auth');
-                        $this->flash->message('exito', "Bienvenido/a " . $miSesion['usuario_nombreCompleto']);
+                        $this->flash->notice("Bienvenido/a " . $miSesion['usuario_nombreCompleto']);
                         //Redireccionar la ejecución si el usuario es valido
-                        return $this->redireccionar('administrar/index');
+                        return $this->redireccionar('nota/search');
                     } else {
                         $this->flash->message('aviso', "<p>EL USUARIO NO TIENE LOS ROLES NECESARIOS PARA ADMINISTRAR</p>");
-                        return $this->redireccionar('sesion/index');
+                        return $this->redireccionar('index/index');
                     }
                 } else {
                     $this->flash->message('problema', "<p>No se encontro el Usuario, verifique contraseña/nick</p>");
@@ -48,7 +48,7 @@ class SesionController extends ControllerBase
             }
 
         }
-        return $this->redireccionar('sesion/index');
+        return $this->redireccionar('index/index');
     }
 
     private function _registrarSesion($usuario)

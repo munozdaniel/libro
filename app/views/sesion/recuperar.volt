@@ -5,6 +5,7 @@
     <!-- /.login-logo -->
     <div class="login-box-body">
         <p class="login-box-msg">Recuperar Contraseña</p>
+        {{ content() }}
         <p class=" alert alert-warning"><i class="fa fa-warning"></i> Ingrese su email institucional para recibir el usuario y la contraseña</p>
 
         {{ form('sesion/enviarContrasena','method':'POST') }}
