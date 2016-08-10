@@ -41,12 +41,14 @@ $di->setShared('view', function () use ($config) {
         '.volt' => function ($view, $di) use ($config) {
 
             $volt = new VoltEngine($view, $di);
-
+            $compiler = $volt->getCompiler();
+            $compiler->addFunction('is_a', 'is_a');
             $volt->setOptions(array(
                 'compiledPath' => $config->application->cacheDir,
                 'compiledSeparator' => '_'
             ));
             $volt->getCompiler()->addFilter('strtotime', 'strtotime');
+
 
             return $volt;
         },
