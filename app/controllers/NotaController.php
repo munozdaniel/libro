@@ -19,29 +19,7 @@ class NotaController extends ControllerBase
      */
     public function searchAction()
     {
-        $this->assets->collection('headerCss')
-            ->addCss('plugins/datatables/dataTables.bootstrap.css');
-        $this->assets->collection('footerJs')
-            ->addJs('plugins/datatables/jquery.dataTables.min.js')
-            ->addJs('plugins/datatables/dataTables.bootstrap.min.js');
-        $this->assets->collection('footerInlineJs')
-            ->addInlineJs('
-                        $(function () {
-                            var table = $(\'#tabla\').DataTable({
-                                paging: true,
-                                lengthChange: false,
-                                searching: false,
-                                ordering: true,
-                                info: true,
-                                autoWidth: true,
-                                scrollX: true,
-                                scrollCollapse: true,
-                                fixedColumns: true,
-                                paging: false,
-
-                            });
-                        });
-            ');
+        $this->setDatatables();
         $numberPage = 1;
         if ($this->request->isPost()) {
             $query = Criteria::fromInput($this->di, "Nota", $_POST);
@@ -289,4 +267,16 @@ class NotaController extends ControllerBase
         ));
     }
 
+    public function verAction($id_documento)
+    {
+
+        $nota = Nota::findFirst(array('id_documento='.$id_documento));
+        if (!$nota) {
+            $this->flash->error("La nota no se encontró");
+            return $this->redireccionar("nota/search");
+        }
+        $this->view->nota_id= $nota->getIdDocumento();
+        $this->view->form = new NotaForm($nota, array('edit' => true,'readOnly'=>'true'));
+
+    }
 }
