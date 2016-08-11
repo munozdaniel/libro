@@ -5,7 +5,7 @@
     <!-- /.login-logo -->
     <div class="login-box-body">
         <p class="login-box-msg">Iniciar Sesión</p>
-
+            {{ content() }}
             {{ form('sesion/ingresar','method':'POST') }}
             <div class="form-group has-feedback">
                 {{ text_field('sesion_nombre',"class":"form-control","placeholder":"Usuario",'required':'',"autofocus":"") }}
