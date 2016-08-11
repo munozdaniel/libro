@@ -23,9 +23,11 @@ class NotaForm extends Form {
         $opcion['required']='';
         $opcion['readOnly']='';
         $opcion['asterisco']='';
+        $opcion['disabled']='';
         if(isset($options['readOnly']))
         {
             $opcion['readOnly']='readOnly';
+            $opcion['disabled']='disabled';
         }
         if(isset($options['required']))
         {
@@ -86,7 +88,8 @@ class NotaForm extends Form {
             'emptyValue' => '',
             'class'      => 'form-control autocompletar',
             $opcion['required']=>'',
-            $opcion['readOnly']=>''
+            $opcion['readOnly']=>'',
+            $opcion['disabled']=>''
         ));
         $elemento->addValidators(array(
             new PresenceOf(array(
@@ -129,7 +132,7 @@ class NotaForm extends Form {
             ))
         ));
         $this->add($elemento);
-        /*========================== DESTINO ==========================*/
+        /*========================== CREADO POR ==========================*/
 
         $elemento = new Text('creadopor',
             array(
