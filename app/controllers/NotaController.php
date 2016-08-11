@@ -66,44 +66,18 @@ class NotaController extends ControllerBase
      *
      * @param string $id_documento
      */
-    public function editAction($id_documento)
+    public function editarAction($id_documento)
     {
 
-        if (!$this->request->isPost()) {
-
-            $nota = Nota::findFirstByid_documento($id_documento);
-            if (!$nota) {
-                $this->flash->error("nota was not found");
-
-                return $this->dispatcher->forward(array(
-                    "controller" => "nota",
-                    "action" => "index"
-                ));
-            }
-
-            $this->view->id_documento = $nota->id_documento;
-
-            $this->tag->setDefault("id_documento", $nota->getIdDocumento());
-            $this->tag->setDefault("destino", $nota->getDestino());
-            $this->tag->setDefault("nro_nota", $nota->getNroNota());
-            $this->tag->setDefault("adjunto", $nota->getAdjunto());
-            $this->tag->setDefault("adjuntar", $nota->getAdjuntar());
-            $this->tag->setDefault("adjuntar_0", $nota->getAdjuntar0());
-            $this->tag->setDefault("creadopor", $nota->getCreadopor());
-            $this->tag->setDefault("descripcion", $nota->getDescripcion());
-            $this->tag->setDefault("fecha", $nota->getFecha());
-            $this->tag->setDefault("habilitado", $nota->getHabilitado());
-            $this->tag->setDefault("sector_id_oid", $nota->getSectorIdOid());
-            $this->tag->setDefault("tipo", $nota->getTipo());
-            $this->tag->setDefault("ultimo", $nota->getUltimo());
-            $this->tag->setDefault("ultimodelanio", $nota->getUltimodelanio());
-            $this->tag->setDefault("version", $nota->getVersion());
-            $this->tag->setDefault("nro", $nota->getNro());
-            $this->tag->setDefault("nota_ultimaModificacion", $nota->getNotaUltimamodificacion());
-            $this->tag->setDefault("nota_sectorOrigenId", $nota->getNotaSectororigenid());
-            $this->tag->setDefault("nota_adjunto", $nota->getNotaAdjunto());
-
+        $nota = Nota::findFirst(array('id_documento='.$id_documento));
+        if (!$nota) {
+            $this->flash->error("La nota no se encontró");
+            return $this->redireccionar("nota/search");
         }
+        $this->view->nota_id= $nota->getIdDocumento();
+        $this->view->form = new NotaForm($nota, array('edit' => true,'required'=>true));
+
+
     }
 
     /**
