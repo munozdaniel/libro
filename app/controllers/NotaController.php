@@ -13,6 +13,7 @@ class NotaController extends ControllerBase
     {
         $this->persistent->parameters = null;
     }
+
     public function listarAction()
     {
         $this->setDatatables();
@@ -40,6 +41,7 @@ class NotaController extends ControllerBase
 
         $this->view->page = $paginator->getPaginate();
     }
+
     /**
      * Searches for nota
      */
@@ -95,13 +97,13 @@ class NotaController extends ControllerBase
     public function editarAction($id_documento)
     {
 
-        $nota = Nota::findFirst(array('id_documento='.$id_documento));
+        $nota = Nota::findFirst(array('id_documento=' . $id_documento));
         if (!$nota) {
             $this->flash->error("La nota no se encontró");
             return $this->redireccionar("nota/search");
         }
-        $this->view->nota_id= $nota->getIdDocumento();
-        $this->view->form = new NotaForm($nota, array('edit' => true,'required'=>true));
+        $this->view->nota_id = $nota->getIdDocumento();
+        $this->view->form = new NotaForm($nota, array('edit' => true, 'required' => true));
 
 
     }
@@ -174,7 +176,7 @@ class NotaController extends ControllerBase
 
         $id = $this->request->getPost("id_documento", "int");
 
-        $product = Nota::findFirst("id_documento=".$id);
+        $product = Nota::findFirst("id_documento=" . $id);
         if (!$product) {
             $this->flash->error("La nota no pudo ser editada.");
             return $this->redireccionar("nota/search");
@@ -246,13 +248,76 @@ class NotaController extends ControllerBase
     public function verAction($id_documento)
     {
 
-        $nota = Nota::findFirst(array('id_documento='.$id_documento));
+        $nota = Nota::findFirst(array('id_documento=' . $id_documento));
         if (!$nota) {
             $this->flash->error("La nota no se encontró");
-            return $this->redireccionar("nota/search");
+            return $this->redireccionar("nota/listar");
         }
-        $this->view->nota_id= $nota->getIdDocumento();
-        $this->view->form = new NotaForm($nota, array('edit' => true,'readOnly'=>true,'required'=>true));
+        $this->view->nota_id = $nota->getIdDocumento();
+        $this->view->form = new NotaForm($nota, array('edit' => true, 'readOnly' => true, 'required' => true));
 
+    }
+
+    public function eliminarAction($id_documento)
+    {
+        $this->view->id_documento = $id_documento;
+    }
+
+    public function eliminarLogicoAction()
+    {
+        if ($this->request->isPost()) {
+            $id_documento = $this->request->getPost('id_documento', 'int');
+            $nota = Nota::findFirst('id_documento=' . $id_documento);
+            if (!$nota) {
+                $this->flash->error("La nota no se encontró");
+                return $this->redireccionar("nota/listar");
+            }
+            //TODO: Habria que controlar concurrencia?
+            if ($nota->getUltimo() == 1) {
+                /*Si es el ultimo, al anteultimo se lo deja ultimo, para que el
+                 siguiente que se agregue continue con la numeracion*/
+                $anterior = Nota::findFirst('id_documento=' . $id_documento-1);
+                if (!$anterior) {
+                }else
+                {
+                    $this->db->begin();
+                    $nota->setUltimo(0);
+                    $nota->setHabilitado(0);
+                    $anterior->setUltimo(1);
+                    if(!$nota->update())
+                    {
+                        $this->db->rollback();
+                        foreach($nota->getMessages() as $mensaje){
+                            $this->flash->error($mensaje);
+                        }
+                    }
+                    else{
+                        if(!$anterior->update())
+                        {
+                            $this->db->rollback();
+                            foreach($nota->getMessages() as $mensaje){
+                                $this->flash->error($mensaje);
+                            }
+                        }
+                    }
+                    $this->db->commit();
+                    $this->flash->success('La nota '.$nota->getNroNota().' ha sido deshabilitada');
+                }
+            } else {
+                /*Si no es el ultimo, se deshabilita*/
+                $this->db->begin();
+                $nota->setUltimo(0);
+                $nota->setHabilitado(0);
+                if(!$nota->update())
+                {
+                    $this->db->rollback();
+                    foreach($nota->getMessages() as $mensaje){
+                        $this->flash->error($mensaje);
+                    }
+                }
+                $this->db->commit();
+                $this->flash->success('La nota '.$nota->getNroNota().' ha sido deshabilitada');
+            }
+        }
     }
 }
