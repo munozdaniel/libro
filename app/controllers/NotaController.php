@@ -21,7 +21,7 @@ class NotaController extends ControllerBase
 
 
         $numberPage = $this->request->getQuery("page", "int");
-        $parameters["order"] = "id_documento";
+        $parameters["order"] = "fecha DESC";
 
         $nota = Nota::find($parameters);
         if (count($nota) == 0) {
