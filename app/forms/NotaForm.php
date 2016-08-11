@@ -20,19 +20,17 @@ class NotaForm extends Form {
      */
     public function initialize($entity = null, $options = array())
     {
-        if(!isset($options['readOnly']))
+        $opcion['required']='';
+        $opcion['readOnly']='';
+        $opcion['asterisco']='';
+        if(isset($options['readOnly']))
         {
-            $readOnly="readOnly='true'";
-        }else{
-            $readOnly="";
+            $opcion['readOnly']='readOnly';
         }
-        if(!isset($options['required']))
+        if(isset($options['required']))
         {
-            $required="required=true";
-            $asterisco='<strong class="text-danger "> * </strong>';
-        }else{
-            $required="";
-            $asterisco='';
+            $opcion['required']='required';
+            $opcion['asterisco']='<strong class="text-danger "> * </strong>';
         }
         /*========================== ID DOCUMENTO ==========================*/
         if (!isset($options['edit'])) {
@@ -40,8 +38,8 @@ class NotaForm extends Form {
                 array(
                     'class'=>'form-control',
                     'maxlength'=>70,
-                    $required,
-                    'readOnly'=>'true'
+                    $opcion['required']=>'',
+                    $opcion['readOnly']=>''
                 ));
             $elemento->setLabel(' ID');
             $this->add($elemento);
@@ -54,10 +52,10 @@ class NotaForm extends Form {
                 'class'=>'form-control',
                 'placeholder'=>'Autogenerado',
                 'maxlength'=>70,
-                $required,
-                $readOnly
+                $opcion['required']=>'',
+                "readOnly"=>'true'
             ));
-        $elemento->setLabel($asterisco.' Nro de Nota');
+        $elemento->setLabel( $opcion['asterisco'].' Nro de Nota');
         $elemento->setFilters(array('int'));
         $elemento->addValidators(array(
             new PresenceOf(array(
@@ -67,8 +65,12 @@ class NotaForm extends Form {
         $this->add($elemento);
         /*========================== FECHA ==========================*/
         $elemento = new Date('fecha',
-            array('class'=>'form-control','required'=>''));
-        $elemento->setLabel($asterisco.' Fecha ');
+            array(
+                'class'=>'form-control',
+                $opcion['required']=>'',
+                $opcion['readOnly']=>''
+            ));
+        $elemento->setLabel( $opcion['asterisco'].' Fecha ');
         $elemento->setFilters(array('striptags', 'string'));
         $elemento->addValidators(array(
             new PresenceOf(array(
@@ -83,15 +85,15 @@ class NotaForm extends Form {
             'emptyText'  => 'Seleccionar ',
             'emptyValue' => '',
             'class'      => 'form-control autocompletar',
-            $required,
-            $readOnly,
+            $opcion['required']=>'',
+            $opcion['readOnly']=>''
         ));
         $elemento->addValidators(array(
             new PresenceOf(array(
                 'message' => 'Seleccione el sector'
             ))
         ));
-            $elemento->setLabel($asterisco.' Sector Origen');
+        $elemento->setLabel( $opcion['asterisco'].'Sector Origen');
         $this->add($elemento);
         /*========================== DESTINO ==========================*/
         $elemento = new Text('destino',
@@ -99,10 +101,10 @@ class NotaForm extends Form {
                 'class'=>'form-control',
                 'placeholder'=>'Ingrese el destino',
                 'maxlength'=>70,
-                $required[0]=>'',
-                $readOnly
+                $opcion['required']=>'',
+                $opcion['readOnly']=>''
             ));
-        $elemento->setLabel($asterisco.' Destino');
+        $elemento->setLabel( $opcion['asterisco'].' Destino');
             $elemento->setFilters(array('striptags', 'string'));
         $elemento->addValidators(array(
             new PresenceOf(array(
@@ -116,10 +118,10 @@ class NotaForm extends Form {
                 'class'=>'form-control',
                 'placeholder'=>'Ingrese la descripción',
                 'maxlength'=>240,
-                $required[0]=>'',
-                $readOnly
+                $opcion['required']=>'',
+                $opcion['readOnly']=>''
             ));
-        $elemento->setLabel($asterisco.' Descripción');
+        $elemento->setLabel( $opcion['asterisco'].' Descripción');
         $elemento->setFilters(array('striptags', 'string'));
         $elemento->addValidators(array(
             new PresenceOf(array(
@@ -128,14 +130,17 @@ class NotaForm extends Form {
         ));
         $this->add($elemento);
         /*========================== DESTINO ==========================*/
+
         $elemento = new Text('creadopor',
             array(
                 'class'=>'form-control',
                 'placeholder'=>'Creado Por',
                 'maxlength'=>70,
-                $required[0]=>'',
-                $readOnly
+                $opcion['required']=>'',
+                "readOnly"=>'true'
             ));
+        $elemento->setLabel( $opcion['asterisco'].' Creado Por');
+
         $elemento->setFilters(array('striptags', 'string'));
         $this->add($elemento);
     }

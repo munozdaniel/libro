@@ -276,7 +276,7 @@ class NotaController extends ControllerBase
             return $this->redireccionar("nota/search");
         }
         $this->view->nota_id= $nota->getIdDocumento();
-        $this->view->form = new NotaForm($nota, array('edit' => true,'readOnly'=>'true'));
+        $this->view->form = new NotaForm($nota, array('edit' => true,'readOnly'=>true,'required'=>true));
 
     }
 }
