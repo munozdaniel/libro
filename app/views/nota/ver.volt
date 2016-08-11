@@ -25,7 +25,7 @@
         <form class="form-horizontal">
             <div class="box-body">
                 <div class="form-group">
-                    {{ link_to('nota/caratula/'~nota_id,'<i class="fa fa-file"></i> Generar Caratula','class':'btn btn-block btn-social btn-tumblr') }}
+                    {{ link_to('caratula/nota/'~nota_id,'<i class="fa fa-file"></i> Generar Caratula','class':'btn btn-block btn-social btn-tumblr', 'target':'_blank') }}
                 </div>
                 <div class="form-group">
                     {{ link_to('nota/editar/'~nota_id,'<i class="fa fa-pencil"></i> Editar Nota','class':'btn btn-block btn-social btn-twitter') }}
