@@ -13,7 +13,33 @@ class NotaController extends ControllerBase
     {
         $this->persistent->parameters = null;
     }
+    public function listarAction()
+    {
+        $this->setDatatables();
+        $this->view->pick('nota/search');
 
+
+        $numberPage = $this->request->getQuery("page", "int");
+        $parameters["order"] = "id_documento";
+
+        $nota = Nota::find($parameters);
+        if (count($nota) == 0) {
+            $this->flash->notice("The search did not find any nota");
+
+            return $this->dispatcher->redireccionar(array(
+                "controller" => "nota",
+                "action" => "index"
+            ));
+        }
+
+        $paginator = new Paginator(array(
+            "data" => $nota,
+            "limit" => 10,
+            "page" => $numberPage
+        ));
+
+        $this->view->page = $paginator->getPaginate();
+    }
     /**
      * Searches for nota
      */
@@ -38,7 +64,7 @@ class NotaController extends ControllerBase
         if (count($nota) == 0) {
             $this->flash->notice("The search did not find any nota");
 
-            return $this->dispatcher->forward(array(
+            return $this->dispatcher->redireccionar(array(
                 "controller" => "nota",
                 "action" => "index"
             ));
@@ -87,7 +113,7 @@ class NotaController extends ControllerBase
     {
 
         if (!$this->request->isPost()) {
-            return $this->dispatcher->forward(array(
+            return $this->dispatcher->redireccionar(array(
                 "controller" => "nota",
                 "action" => "index"
             ));
@@ -120,7 +146,7 @@ class NotaController extends ControllerBase
                 $this->flash->error($message);
             }
 
-            return $this->dispatcher->forward(array(
+            return $this->dispatcher->redireccionar(array(
                 "controller" => "nota",
                 "action" => "new"
             ));
@@ -128,7 +154,7 @@ class NotaController extends ControllerBase
 
         $this->flash->success("nota was created successfully");
 
-        return $this->dispatcher->forward(array(
+        return $this->dispatcher->redireccionar(array(
             "controller" => "nota",
             "action" => "index"
         ));
@@ -143,64 +169,40 @@ class NotaController extends ControllerBase
     {
 
         if (!$this->request->isPost()) {
-            return $this->dispatcher->forward(array(
-                "controller" => "nota",
-                "action" => "index"
-            ));
+            return $this->redireccionar("nota/search");
         }
 
-        $id_documento = $this->request->getPost("id_documento");
+        $id = $this->request->getPost("id_documento", "int");
 
-        $nota = Nota::findFirstByid_documento($id_documento);
-        if (!$nota) {
-            $this->flash->error("nota does not exist " . $id_documento);
-
-            return $this->dispatcher->forward(array(
-                "controller" => "nota",
-                "action" => "index"
-            ));
+        $product = Nota::findFirst("id_documento=".$id);
+        if (!$product) {
+            $this->flash->error("La nota no pudo ser editada.");
+            return $this->redireccionar("nota/search");
         }
 
-        $nota->setDestino($this->request->getPost("destino"));
-        $nota->setNroNota($this->request->getPost("nro_nota"));
-        $nota->setAdjunto($this->request->getPost("adjunto"));
-        $nota->setAdjuntar($this->request->getPost("adjuntar"));
-        $nota->setAdjuntar0($this->request->getPost("adjuntar_0"));
-        $nota->setCreadopor($this->request->getPost("creadopor"));
-        $nota->setDescripcion($this->request->getPost("descripcion"));
-        $nota->setFecha($this->request->getPost("fecha"));
-        $nota->setHabilitado($this->request->getPost("habilitado"));
-        $nota->setSectorIdOid($this->request->getPost("sector_id_oid"));
-        $nota->setTipo($this->request->getPost("tipo"));
-        $nota->setUltimo($this->request->getPost("ultimo"));
-        $nota->setUltimodelanio($this->request->getPost("ultimodelanio"));
-        $nota->setVersion($this->request->getPost("version"));
-        $nota->setNro($this->request->getPost("nro"));
-        $nota->setNotaUltimamodificacion($this->request->getPost("nota_ultimaModificacion"));
-        $nota->setNotaSectororigenid($this->request->getPost("nota_sectorOrigenId"));
-        $nota->setNotaAdjunto($this->request->getPost("nota_adjunto"));
+        $form = new NotaForm;
+        $this->view->form = $form;
 
+        $data = $this->request->getPost();
 
-        if (!$nota->save()) {
-
-            foreach ($nota->getMessages() as $message) {
+        if (!$form->isValid($data, $product)) {
+            foreach ($form->getMessages() as $message) {
                 $this->flash->error($message);
             }
-
-            return $this->dispatcher->forward(array(
-                "controller" => "nota",
-                "action" => "edit",
-                "params" => array($nota->id_documento)
-            ));
+            return $this->redireccionar('nota/editar/' . $id);
         }
 
-        $this->flash->success("nota was updated successfully");
+        if ($product->save() == false) {
+            foreach ($product->getMessages() as $message) {
+                $this->flash->error($message);
+            }
+            return $this->redireccionar('nota/editar/' . $id);
+        }
 
-        return $this->dispatcher->forward(array(
-            "controller" => "nota",
-            "action" => "index"
-        ));
+        $form->clear();
 
+        $this->flash->success("La nota ha sido actualizada correctamente");
+        return $this->redireccionar("nota/search");
     }
 
     /**
@@ -215,7 +217,7 @@ class NotaController extends ControllerBase
         if (!$nota) {
             $this->flash->error("nota was not found");
 
-            return $this->dispatcher->forward(array(
+            return $this->dispatcher->redireccionar(array(
                 "controller" => "nota",
                 "action" => "index"
             ));
@@ -227,7 +229,7 @@ class NotaController extends ControllerBase
                 $this->flash->error($message);
             }
 
-            return $this->dispatcher->forward(array(
+            return $this->dispatcher->redireccionar(array(
                 "controller" => "nota",
                 "action" => "search"
             ));
@@ -235,7 +237,7 @@ class NotaController extends ControllerBase
 
         $this->flash->success("nota was deleted successfully");
 
-        return $this->dispatcher->forward(array(
+        return $this->dispatcher->redireccionar(array(
             "controller" => "nota",
             "action" => "index"
         ));
