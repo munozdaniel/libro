@@ -14,6 +14,7 @@ $loader->registerDirs(
     array(
         $config->application->controllersDir,
         $config->application->formsDir,
+        $config->application->mpdfDir,
         $config->application->modelsDir
     )
 )->register();

@@ -26,6 +26,7 @@ return new \Phalcon\Config(array(
         'viewsDir'       => APP_PATH . '/app/views/',
         'pluginsDir'     => APP_PATH . '/app/plugins/',
         'libraryDir'     => APP_PATH . '/app/library/',
+        'mpdfDir'        => APP_PATH . '/app/library/mpdf/',
         'formsDir'       => APP_PATH . '/app/forms/',
         'cacheDir'       => APP_PATH . '/app/cache/',
         'baseUri'        => '/libro/',
