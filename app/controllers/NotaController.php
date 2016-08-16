@@ -66,10 +66,7 @@ class NotaController extends ControllerBase
         if (count($nota) == 0) {
             $this->flash->notice("No hay notas cargadas en el sistema");
 
-            return $this->dispatcher->redireccionar(array(
-                "controller" => "nota",
-                "action" => "index"
-            ));
+            return $this->redireccionar('nota/listar');
         }
 
         $paginator = new Paginator(array(
@@ -86,6 +83,8 @@ class NotaController extends ControllerBase
      */
     public function newAction()
     {
+        $this->persistent->parameters = null;
+
         $this->assets->collection('headerCss')
             ->addCss('plugins/select2/select2.min.css');
         $this->assets->collection('footerJs')
@@ -109,7 +108,7 @@ class NotaController extends ControllerBase
             $this->flash->error("La nota no se encontró");
             return $this->redireccionar("nota/search");
         }
-        $this->view->nota_id = $nota->getIdDocumento();
+        $this->view->nota = $nota;
         $this->view->form = new NotaForm($nota, array('edit' => true, 'required' => true));
 
 
@@ -205,26 +204,10 @@ class NotaController extends ControllerBase
         $form = new NotaForm;
         $this->view->form = $form;
         $data = $this->request->getPost();
-
         $form->bind($data, $nota);
-        /*Obtenemos el ultimo numero de nota*/
-        $ultimo = Nota::findFirst("ultimo=1");
-        if (!$ultimo) {
-            $nota->setNroNota(1);
-            $nota->setUltimo(1);
-        } else {
-            $ultimo->setUltimo(0);
-            if (!$ultimo->update()) {
-                $this->db->rollback();
-                foreach ($nota->getMessages() as $message) {
-                    $this->flash->error($message);
-                }
-                return $this->redireccionar('nota/editar/' . $id);
-            }
-            $nota->setNroNota($ultimo->getNroNota() + 1);
-        }
-
-        if (!$form->isValid($data, $nota)) {
+        /*Validamos el formulario*/
+        if (!$form->isValid()) {
+            $this->db->rollback();
             foreach ($form->getMessages() as $message) {
                 $this->flash->error($message);
             }
@@ -232,12 +215,15 @@ class NotaController extends ControllerBase
         }
 
         /*Guardamos el adjunto*/
-        $nombreCarpeta = 'files/nota/' . date('Ymd') . '/' . $nota->getNroNota();
-        $path = $this->guardarAdjunto($this->request->getUploadedFiles(), $nombreCarpeta);
-        if ($path == "") {
-            $this->flash->error("Ocurrió un problema al guardar el archivo adjunto. Edite la nota para volver a adjuntar el archivo.");
-        }
-        $nota->setAdjunto($path);
+        $archivos = $this->request->getUploadedFiles();
+       if($archivos[0]->getName()!="") {
+           $nombreCarpeta = 'files/nota/' . date('Ymd') . '/' . $nota->getNroNota();
+           $path = $this->guardarAdjunto($this->request->getUploadedFiles(), $nombreCarpeta);
+           if ($path == "") {
+               $this->flash->error("Ocurrió un problema al guardar el archivo adjunto. Edite la nota para volver a adjuntar el archivo.");
+           }
+           $nota->setNotaAdjunto($path);
+       }
         /*Actualizamos los datos*/
         if ($nota->save() == false) {
             $this->db->rollback();
@@ -249,8 +235,9 @@ class NotaController extends ControllerBase
 
         $form->clear();
 
-        $this->flash->success("La nota ha sido actualizada correctamente");
-        return $this->redireccionar("nota/search");
+        $this->db->commit();
+        $this->flashSession->success("La Nota ha sido actualizada correctamente");
+        return $this->response->redirect('nota/listar');
     }
 
 
