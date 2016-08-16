@@ -1,6 +1,6 @@
 
 {{ content() }}
-
+{{ flashSession.output() }}
 
 <table id="tabla" class="table table-bordered table-hover  table-striped" align="center">
     <thead>
