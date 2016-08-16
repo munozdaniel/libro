@@ -11,10 +11,16 @@
             </div>
         {% endif %}
     {% endfor %}
-    <div class="form-group">
-        <label for="nota_adjunto">Adjunto</label>
-       {{ text_field('nota_adjunto','value':nota.getNotaAdjunto(),'class':'form-control','readOnly':'','placeholder':'SIN ADJUNTO') }}
+    <label for="creadopor" class="btn-block"> Adjunto</label>
+
+    <div class="input-group ">
+        <div class="input-group-btn">
+            {{ link_to(nota.getNotaAdjunto(),'Abrir ','class':'btn btn-danger btn-flat') }}
+        </div>
+        <!-- /btn-group -->
+        {{ text_field('nota_adjunto','value':nota.getNotaAdjunto(),'class':'form-control','readOnly':'','placeholder':'SIN ADJUNTO') }}
     </div>
+
 
 </div>
 
@@ -29,17 +35,16 @@
         <form class="form-horizontal">
             <div class="box-body">
                 <div class="form-group">
-                    {{ link_to('caratula/nota/'~nota.getIdDocumento(),'<i class="fa fa-file"></i> Generar Caratula','class':'btn btn-block btn-social btn-tumblr', 'target':'_blank') }}
+                    {{ link_to('caratula/nota/'~nota.getIdDocumento(),'<i class="fa fa-file"></i> Generar Caratula','class':'btn btn-flat btn-block btn-social btn-tumblr', 'target':'_blank') }}
                 </div>
                 <div class="form-group">
-                    {{ link_to('nota/editar/'~nota.getIdDocumento(),'<i class="fa fa-pencil"></i> Editar Nota','class':'btn btn-block btn-social btn-twitter') }}
+                    {{ link_to('nota/editar/'~nota.getIdDocumento(),'<i class="fa fa-pencil"></i> Editar Nota','class':'btn btn-flat btn-block btn-social btn-twitter') }}
                 </div>
                 <div class="form-group">
-                    {{ link_to('nota/eliminar/'~nota.getIdDocumento(),'<i class="fa fa-remove"></i> Eliminar Nota','class':'btn btn-block btn-social btn-google') }}
+                    {{ link_to('nota/eliminar/'~nota.getIdDocumento(),'<i class="fa fa-remove"></i> Eliminar Nota','class':'btn btn-block btn-flat btn-social btn-google') }}
                 </div>
             </div>
         </form>
     </div>
     <!-- /.box -->
-
 </div>
