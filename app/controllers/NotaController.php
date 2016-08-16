@@ -165,7 +165,7 @@ class NotaController extends ControllerBase
         if ($path == "") {
             $this->flashSession->error("Ocurrió un problema al guardar el archivo adjunto. Edite la nota para volver a adjuntar el archivo.");
         }
-        $nota->setAdjunto($path);
+        $nota->setNotaAdjunto($path);
         /*Guardamos la instancia en la bd*/
         if ($nota->save() == false) {
             $this->db->rollback();
@@ -300,7 +300,7 @@ class NotaController extends ControllerBase
             $this->flash->error("La nota no se encontró");
             return $this->redireccionar("nota/listar");
         }
-        $this->view->nota_id = $nota->getIdDocumento();
+        $this->view->nota = $nota;
         $this->view->form = new NotaForm($nota, array('edit' => true, 'readOnly' => true, 'required' => true));
 
     }
