@@ -41,14 +41,14 @@ $di->setShared('view', function () use ($config) {
         '.volt' => function ($view, $di) use ($config) {
 
             $volt = new VoltEngine($view, $di);
-            $compiler = $volt->getCompiler();
-            $compiler->addFunction('is_a', 'is_a');
+
             $volt->setOptions(array(
                 'compiledPath' => $config->application->cacheDir,
                 'compiledSeparator' => '_'
             ));
+            $volt->getCompiler()->addFunction('is_a', 'is_a');
+            $volt->getCompiler()->addFunction('base64', 'base64_encode');
             $volt->getCompiler()->addFilter('strtotime', 'strtotime');
-
 
             return $volt;
         },
@@ -57,7 +57,6 @@ $di->setShared('view', function () use ($config) {
 
     return $view;
 });
-
 /**
  * Database connection is created based in the parameters defined in the configuration file
  */
@@ -113,4 +112,25 @@ $di->setShared('session', function () {
  */
 $di->set('elements', function(){
     return new Entorno\Elements();
+});
+
+
+/**
+ * Registramos el gestor de eventos (Utilizado en plugins/Seguridad.php)
+ */
+$di->set('dispatcher', function() use ($di)
+{
+    $eventsManager = $di->getShared('eventsManager');
+
+    $roles = new Seguridad($di);
+
+    /**
+     * Escuchamos eventos en el componente dispatcher usando el plugin Roles
+     */
+    $eventsManager->attach('dispatch', $roles);
+
+    $dispatcher = new Phalcon\Mvc\Dispatcher();
+    $dispatcher->setEventsManager($eventsManager);
+
+    return $dispatcher;
 });
