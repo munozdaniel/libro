@@ -59,11 +59,6 @@ class NotaForm extends Form {
             ));
         $elemento->setLabel( $opcion['asterisco'].' Nro de Nota');
         $elemento->setFilters(array('int'));
-        $elemento->addValidators(array(
-            new PresenceOf(array(
-                'message' => 'El Número es requerido'
-            ))
-        ));
         $this->add($elemento);
         /*========================== FECHA ==========================*/
         $elemento = new Date('fecha',
@@ -89,7 +84,8 @@ class NotaForm extends Form {
             'class'      => 'form-control autocompletar',
             $opcion['required']=>'',
             $opcion['readOnly']=>'',
-            $opcion['disabled']=>''
+            $opcion['disabled']=>'',
+            'style'=>"width: 100%; height:40px !important;"
         ));
         $elemento->addValidators(array(
             new PresenceOf(array(
@@ -143,7 +139,8 @@ class NotaForm extends Form {
                 "readOnly"=>'true'
             ));
         $elemento->setLabel( $opcion['asterisco'].' Creado Por');
-
+        $miSesion = $this->session->get('auth');
+        $elemento->setDefault($miSesion['usuario_nombreCompleto']);
         $elemento->setFilters(array('striptags', 'string'));
         $this->add($elemento);
     }

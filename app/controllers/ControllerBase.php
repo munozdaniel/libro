@@ -45,4 +45,40 @@ class ControllerBase extends Controller
                         });
             ');
     }
+
+
+    /**
+     * Guarda el archivo pdf en la carpeta : 'CLIENTE/fechaCreacionPlanilla/NombrePDF'
+     * @param $archivos
+     * @param $nombreCarpeta
+     * @return array
+     */
+    public function guardarAdjunto($archivos, $nombreCarpeta)
+    {
+       /* $retorno = array();
+        $retorno['path'] = '';//Nombre de la ruta en donde se guardo el archivo
+        $retorno['success'] = false;//Si finaliza correctamente o no.
+        $retorno['mensaje'] = '';//Mensaje de error en caso de que falle.*/
+        $retorno= "";
+        foreach ($archivos as $archivo) {
+
+            //Creando Carpeta
+            $nombreArchivo = $archivo->getName();
+            if (!file_exists($nombreCarpeta)) {
+                mkdir($nombreCarpeta, 0777, true);
+            }
+            $path = $nombreCarpeta . '/' . $nombreArchivo;
+            #move the file and simultaneously check if everything was ok
+            ($archivo->moveTo($path)) ? $band= true : $band = false;
+            if (!$band)
+                echo "No se pudo guardar los archivos adjuntos.";
+            else {
+                $retorno = $path;
+            }
+
+        }
+        return $retorno;
+
+    }
+
 }
