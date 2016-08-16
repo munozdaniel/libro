@@ -22,7 +22,7 @@
       {% if is_a(element, 'Phalcon\Forms\Element\Hidden') %}
           {{ element }}
       {% else %}
-          <div class="form-group ">
+          <div class="form-group">
               {{ element.label(['class': 'btn-block']) }}
               {{ element.render() }}
           </div>
@@ -36,7 +36,7 @@
     </div>
 </div>
 {{ end_form() }}
-<div class="col-md-4 col-md-offset-1" style="margin-top:10em;">
+<div class="col-md-4 col-md-offset-1" style="margin-top:2em;">
     <div class="modal modal-success">
             <div class="modal-content">
                 <div class="modal-header">
