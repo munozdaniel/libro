@@ -36,20 +36,28 @@
     </div>
 </div>
 {{ end_form() }}
-<div class="col-md-4 col-md-offset-1" style="margin-top:2em;">
-    <div class="modal modal-success">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title">GUARDAR NUEVA NOTA</h4>
+<div class="col-md-5 col-md-offset-1">
+    <!-- Horizontal Form -->
+    <div class="box box-success">
+        <div class="box-header with-border">
+            <h3 class="box-title">Guardar Nueva Nota</h3>
+        </div>
+        <!-- /.box-header -->
+        <!-- form start -->
+        <form class="form-horizontal">
+            <div class="box-body">
+                <div class="form-group">
+                    {{ link_to('nota/listar','<i class="fa fa-remove"></i> Cancelar','class':'btn btn-flat btn-block btn-social btn-tumblr') }}
                 </div>
-                <div class="modal-body">
-                    {{ link_to('nota/listar','<i class="fa fa-remove"></i> Cancelar ','class':'btn btn-outline ') }}
-                    {{ submit_button('Guardar ','class':'btn btn-outline pull-right','form':'nuevo') }}
+                <div class="form-group">
+                    <button type="submit" form="nuevo" class="btn btn-flat btn-block btn-social btn-twitter">
+                        <i class="fa fa-check"></i> Guardar Nota
+                    </button>
+                </div>
 
-                </div>
             </div>
-        <!-- /.modal-dialog -->
+        </form>
     </div>
+    <!-- /.box -->
 </div>
+
