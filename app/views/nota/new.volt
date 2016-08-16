@@ -1,4 +1,18 @@
+<style>
+    .modal {
+        position: relative;
+        top: auto;
+        bottom: auto;
+        right: auto;
+        left: auto;
+        display: block;
+        z-index: 1;
+    }
 
+     .modal {
+        background: transparent !important;
+    }
+</style>
 {{ form("nota/create", "method":"post",'id':'nuevo','enctype':'multipart/form-data') }}
 {{ content() }}
 {{ flashSession.output() }}
@@ -22,21 +36,20 @@
     </div>
 </div>
 {{ end_form() }}
-<div class="col-md-5 col-md-offset-1">
-    <!-- Horizontal Form -->
-    <div class="box box-info">
-        <div class="box-header with-border">
-            <h3 class="box-title">Operaciones</h3>
-        </div>
-        <!-- /.box-header -->
-        <!-- form start -->
-        <form class="form-horizontal">
-            <div class="box-body">
-                {{ submit_button('Guardar Nota','class':' ','form':'nuevo') }}
-                {{ link_to('nota/listar','<i class="fa fa-remove"></i> Cancelar ','class':'pull-right') }}
-            </div>
-        </form>
-    </div>
-    <!-- /.box -->
+<div class="col-md-4 col-md-offset-1" style="margin-top:10em;">
+    <div class="modal modal-success">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">GUARDAR NUEVA NOTA</h4>
+                </div>
+                <div class="modal-body">
+                    {{ link_to('nota/listar','<i class="fa fa-remove"></i> Cancelar ','class':'btn btn-outline ') }}
+                    {{ submit_button('Guardar ','class':'btn btn-outline pull-right','form':'nuevo') }}
 
+                </div>
+            </div>
+        <!-- /.modal-dialog -->
+    </div>
 </div>
