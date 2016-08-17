@@ -15,7 +15,7 @@
 
     <div class="input-group ">
         <div class="input-group-btn">
-            {{ link_to(nota.getNotaAdjunto(),'Abrir ','class':'btn btn-danger btn-flat') }}
+            {{ link_to(nota.getNotaAdjunto(),'Abrir ','class':'btn btn-danger btn-flat','target':'_blank') }}
         </div>
         <!-- /btn-group -->
         {{ text_field('nota_adjunto','value':nota.getNotaAdjunto(),'class':'form-control','readOnly':'','placeholder':'SIN ADJUNTO') }}
