@@ -20,9 +20,9 @@
         <tr>
             <td>
                 {% if nota.getHabilitado()==1 %}
-                {{ link_to('nota/ver/'~nota.getIdDocumento(),'<i class="fa fa-file"></i> ','class':'btn btn-primary btn-flat') }}
+                {{ link_to('nota/ver/'~nota.getIdDocumento(),'<i class="fa fa-file"></i> ','class':'btn btn-primary btn-flat','style':'border-width: 4px;') }}
                 {% else %}
-                    {{ link_to('nota/ver/'~nota.getIdDocumento(),'<i class="fa fa-file"></i> ','class':'btn btn-danger btn-flat') }}
+                    {{ link_to('nota/ver/'~nota.getIdDocumento(),'<i class="fa fa-file"></i> ','class':'btn btn-danger btn-flat','style':'border-width: 4px;') }}
                 {% endif %}
             </td>
             <td>{{ nota.getNroNota() }}</td>
