@@ -224,6 +224,7 @@ class NotaController extends ControllerBase
         $this->view->id_documento = $id_documento;
     }
 
+
     /**
      * Elimina la nota de manera logica
      * Si es la ultima nota: la nota anterior  debera convertirse en la ultima para que la numeracion continue.

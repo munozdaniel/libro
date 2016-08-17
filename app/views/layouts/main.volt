@@ -25,15 +25,15 @@
                     <li class="dropdown user user-menu">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                             {{ image('img/entorno/user.jpeg','alt':'usuario','class':'user-image') }}
-                            <span class="hidden-xs">Alexander Pierce</span>
+                            <span class="hidden-xs">{{ session.get('auth')['usuario_nombreCompleto'] }}</span>
                         </a>
                         <ul class="dropdown-menu">
                             <!-- User image -->
                             <li class="user-header">
                                 {{ image('img/entorno/user.jpeg','alt':'usuario','class':'img-circle') }}
                                 <p>
-                                    Alexander Pierce - Web Developer
-                                    <small>Member since Nov. 2012</small>
+                                    {{ session.get('auth')['usuario_nombreCompleto'] }}
+                                    <small>{{ session.get('auth')['rol_nombre'] }}</small>
                                 </p>
                             </li>
 
@@ -68,8 +68,8 @@
                     {{ image('img/entorno/user.jpeg','alt':'usuario','class':'img-circle') }}
                 </div>
                 <div class="pull-left info">
-                    <p>Alexander Pierce</p>
-                    <a href="#"><i class="fa fa-circle text-success"></i> </a>
+                    <p> {{ session.get('auth')['usuario_nick'] }}</p>
+                    <a href="#"><i class="fa fa-circle text-success"></i> Online </a>
                 </div>
             </div>
             <!-- sidebar menu: : style can be found in sidebar.less -->

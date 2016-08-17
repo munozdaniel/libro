@@ -109,11 +109,11 @@ $di->setShared('session', function () {
 });
 /**
  * Register a user component
- */
-$di->set('elements', function(){
+ Sin usar
+$di->set('elemento', function(){
     return new Entorno\Elements();
 });
-
+ */
 
 /**
  * Registramos el gestor de eventos (Utilizado en plugins/Seguridad.php)
