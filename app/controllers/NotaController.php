@@ -213,13 +213,13 @@ class NotaController extends ControllerBase
     {
         $nota = Nota::findFirst('id_documento=' . $id_documento);
         if (!$nota) {
-            $this->flash->error("La nota no se encontró");
-            return $this->redireccionar("nota/listar");
+            $this->flashSession->error("La nota no se encontró");
+            return $this->response->redirect("nota/listar");
         }
         if($nota->getHabilitado()==0)
         {
-            $this->flash->warning("La nota ya fue eliminada");
-            return $this->redireccionar("nota/listar");
+            $this->flashSession->warning("La nota ya fue eliminada");
+            return $this->response->redirect("nota/listar");
         }
         $this->view->id_documento = $id_documento;
     }
@@ -238,8 +238,8 @@ class NotaController extends ControllerBase
 
             $nota = Nota::findFirst('id_documento=' . $id_documento);
             if (!$nota) {
-                $this->flash->error("La nota no se encontró");
-                return $this->redireccionar("nota/listar");
+                $this->flashSession->warning("La nota no se encontró");
+                return $this->response->redirect("nota/listar");
             }
             $this->db->begin();
             if ($nota->getUltimo() == 1) {
@@ -267,6 +267,7 @@ class NotaController extends ControllerBase
                                 foreach ($nota->getMessages() as $mensaje) {
                                     $this->flash->error($mensaje);
                                 }
+                                return $this->redireccionar('nota/eliminar/'.$id_documento);
                             }
                         }
                     }
@@ -279,6 +280,7 @@ class NotaController extends ControllerBase
                     foreach ($nota->getMessages() as $mensaje) {
                         $this->flash->error($mensaje);
                     }
+                    return $this->redireccionar('nota/eliminar/'.$id_documento);
                 }
                 $this->db->commit();
                 $this->flash->success('La nota ' . $nota->getNroNota() . ' ha sido deshabilitada');
@@ -292,12 +294,13 @@ class NotaController extends ControllerBase
                     foreach ($nota->getMessages() as $mensaje) {
                         $this->flash->error($mensaje);
                     }
+                    return $this->redireccionar('nota/eliminar/'.$id_documento);
                 }
                 $this->db->commit();
-                $this->flash->success('La nota ' . $nota->getNroNota() . ' ha sido deshabilitada');
+                $this->flashSession->success('La nota ' . $nota->getNroNota() . ' ha sido deshabilitada');
             }
         }
-        $this->redireccionar('nota/listar');
+        return $this->response->redirect("nota/listar");
     }
 
     /* ====================================================
