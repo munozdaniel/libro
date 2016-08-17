@@ -1,174 +1,154 @@
+<section>
+    <div class="col-md-12  bg-gray">
+        <div class="nav-tabs-custom">
+            <ul class="nav nav-tabs">
+                <li class="active"><a href="#busquedaGeneral" data-toggle="tab">Búsqueda General</a></li>
+                <li><a href="#porSectorYFecha" data-toggle="tab">Por Sector y Fechas </a></li>
+                <li><a href="#EntreFechas" data-toggle="tab">Entre Fechas</a></li>
+                <li><a href="#EntreNumeros" data-toggle="tab">Entre Números de Notas</a></li>
+            </ul>
+            <div class="tab-content">
+                <div class="active tab-pane" id="busquedaGeneral">
+                    {{ form('nota/search','method':'POST','class':'form-horizontal') }}
+                    {{ content() }}
+                    {{ flashSession.output() }}
 
-{{ content() }}
+                    <div class="alert alert-info"><i class="fa fa-info-circle"></i> Ingrese únicamente los campos necesario. No son obligatorios</div>
+                    <div class="form-group">
+                        <label for="nro_nota" class="col-sm-2 control-label">Nro Nota</label>
 
-<div align="right">
-    {{ link_to("nota/new", "Create nota") }}
-</div>
+                        <div class="col-sm-4">
+                            {{ text_field('nro_nota','class': 'form-control','placeholder':'Ingrese el Nro de Nota') }}
+                        </div>
+                    </div>
 
-{{ form("nota/search", "method":"post", "autocomplete" : "off") }}
+                    <div class="form-group">
+                        {{ form.label('fecha',['class': 'col-sm-2 control-label']) }}
+                        <div class="col-sm-4">
+                            {{ form.render('fecha',['class': 'form-control']) }}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        {{ form.label('nota_sectorOrigenId',['class': 'col-sm-2 control-label']) }}
+                        <div class="col-sm-4">
+                            {{ form.render('nota_sectorOrigenId',['class': 'form-control autocompletar']) }}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        {{ form.label('destino',['class': 'col-sm-2 control-label']) }}
+                        <div class="col-sm-4">
+                            {{ form.render('destino',['class': 'form-control']) }}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        {{ form.label('descripcion',['class': 'col-sm-2 control-label']) }}
+                        <div class="col-sm-4">
+                            {{ form.render('descripcion',['class': 'form-control']) }}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        {{ form.label('creadopor',['class': 'col-sm-2 control-label']) }}
+                        <div class="col-sm-4">
+                            {{ text_field('creadopor','class': 'form-control','placeholder':'Ingrese el usuario') }}
+                        </div>
+                    </div>
 
-<div align="center">
-    <h1>Search nota</h1>
-</div>
+                    <div class="form-group">
+                        <div class="col-sm-offset-2 col-sm-10">
+                            <button type="submit" class="btn btn-danger btn-flat">BUSCAR</button>
+                        </div>
+                    </div>
+                    {{ end_form() }}
 
-<table>
-    <tr>
-        <td align="right">
-            <label for="id_documento">Id Of Documento</label>
-        </td>
-        <td align="left">
-            {{ text_field("id_documento", "size" : 30) }}
-        </td>
-    </tr>
-    <tr>
-        <td align="right">
-            <label for="destino">Destino</label>
-        </td>
-        <td align="left">
-            {{ text_field("destino", "size" : 30) }}
-        </td>
-    </tr>
-    <tr>
-        <td align="right">
-            <label for="nro_nota">Nro Of Nota</label>
-        </td>
-        <td align="left">
-            {{ text_field("nro_nota", "type" : "numeric") }}
-        </td>
-    </tr>
-    <tr>
-        <td align="right">
-            <label for="adjunto">Adjunto</label>
-        </td>
-        <td align="left">
-            {{ text_field("adjunto", "size" : 30) }}
-        </td>
-    </tr>
-    <tr>
-        <td align="right">
-            <label for="adjuntar">Adjuntar</label>
-        </td>
-        <td align="left">
-            {{ text_field("adjuntar", "size" : 30) }}
-        </td>
-    </tr>
-    <tr>
-        <td align="right">
-            <label for="adjuntar_0">Adjuntar Of 0</label>
-        </td>
-        <td align="left">
-            {{ text_field("adjuntar_0", "size" : 30) }}
-        </td>
-    </tr>
-    <tr>
-        <td align="right">
-            <label for="creadopor">Creadopor</label>
-        </td>
-        <td align="left">
-            {{ text_field("creadopor", "size" : 30) }}
-        </td>
-    </tr>
-    <tr>
-        <td align="right">
-            <label for="descripcion">Descripcion</label>
-        </td>
-        <td align="left">
-            {{ text_field("descripcion", "size" : 30) }}
-        </td>
-    </tr>
-    <tr>
-        <td align="right">
-            <label for="fecha">Fecha</label>
-        </td>
-        <td align="left">
-                {{ text_field("fecha", "type" : "date") }}
-        </td>
-    </tr>
-    <tr>
-        <td align="right">
-            <label for="habilitado">Habilitado</label>
-        </td>
-        <td align="left">
-            {{ text_field("habilitado", "type" : "numeric") }}
-        </td>
-    </tr>
-    <tr>
-        <td align="right">
-            <label for="sector_id_oid">Sector Of Id Of Oid</label>
-        </td>
-        <td align="left">
-            {{ text_field("sector_id_oid", "size" : 30) }}
-        </td>
-    </tr>
-    <tr>
-        <td align="right">
-            <label for="tipo">Tipo</label>
-        </td>
-        <td align="left">
-            {{ text_field("tipo", "type" : "numeric") }}
-        </td>
-    </tr>
-    <tr>
-        <td align="right">
-            <label for="ultimo">Ultimo</label>
-        </td>
-        <td align="left">
-            {{ text_field("ultimo", "type" : "numeric") }}
-        </td>
-    </tr>
-    <tr>
-        <td align="right">
-            <label for="ultimodelanio">Ultimodelanio</label>
-        </td>
-        <td align="left">
-            {{ text_field("ultimodelanio", "type" : "numeric") }}
-        </td>
-    </tr>
-    <tr>
-        <td align="right">
-            <label for="version">Version</label>
-        </td>
-        <td align="left">
-            {{ text_field("version", "size" : 30) }}
-        </td>
-    </tr>
-    <tr>
-        <td align="right">
-            <label for="nro">Nro</label>
-        </td>
-        <td align="left">
-            {{ text_field("nro", "size" : 30) }}
-        </td>
-    </tr>
-    <tr>
-        <td align="right">
-            <label for="nota_ultimaModificacion">Nota Of UltimaModificacion</label>
-        </td>
-        <td align="left">
-            {{ text_field("nota_ultimaModificacion", "size" : 30) }}
-        </td>
-    </tr>
-    <tr>
-        <td align="right">
-            <label for="nota_sectorOrigenId">Nota Of SectorOrigenId</label>
-        </td>
-        <td align="left">
-            {{ text_field("nota_sectorOrigenId", "type" : "numeric") }}
-        </td>
-    </tr>
-    <tr>
-        <td align="right">
-            <label for="nota_adjunto">Nota Of Adjunto</label>
-        </td>
-        <td align="left">
-            {{ text_field("nota_adjunto", "type" : "numeric") }}
-        </td>
-    </tr>
+                </div>
 
-    <tr>
-        <td></td>
-        <td>{{ submit_button("Search") }}</td>
-    </tr>
-</table>
+                <div class="tab-pane" id="porSectorYFecha">
+                    {{ form('nota/searchEntreFechas','method':'POST','class':'form-horizontal') }}
+                    <div class="form-group">
+                        {{ form.label('nota_sectorOrigenId',['class': 'col-sm-2 control-label']) }}
+                        <div class="col-sm-4">
+                            {{ form.render('nota_sectorOrigenId',['class': 'form-control autocompletar','required':'true']) }}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="fechaDesde" class="col-sm-2 control-label">Desde</label>
 
-</form>
+                        <div class="col-sm-4">
+                            {{ date_field('fecha_desde','class': 'form-control','required':'true') }}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="fechaHasta" class="col-sm-2 control-label">Hasta</label>
+
+                        <div class="col-sm-4">
+                            {{ date_field('fecha_hasta','class': 'form-control ','required':'true') }}
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-sm-offset-2 col-sm-10">
+                            <button type="submit" class="btn btn-danger btn-flat">BUSCAR</button>
+                        </div>
+                    </div>
+                    {{ end_form() }}
+                </div>
+                <!-- /.tab-pane -->
+                <div class="tab-pane" id="EntreFechas">
+                    {{ form('nota/searchEntreFechas','method':'POST','class':'form-horizontal') }}
+
+                    <div class="form-group">
+                        <label for="fechaDesde" class="col-sm-2 control-label">Desde</label>
+
+                        <div class="col-sm-4">
+                            {{ date_field('fecha_desde','class': 'form-control','required':'true') }}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="fechaHasta" class="col-sm-2 control-label">Hasta</label>
+
+                        <div class="col-sm-4">
+                            {{ date_field('fecha_hasta','class': 'form-control ','required':'true') }}
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-sm-offset-2 col-sm-10">
+                            <button type="submit" class="btn btn-danger btn-flat">BUSCAR</button>
+                        </div>
+                    </div>
+                    {{ end_form() }}
+                </div>
+                <!-- /.tab-pane -->
+                <div class="tab-pane" id="EntreNumeros">
+                    {{ form('nota/searchEntreNumeros','method':'POST','class':'form-horizontal') }}
+
+                    <div class="form-group">
+                        <label for="nroInicial" class="col-sm-2 control-label">Nro Inicial</label>
+
+                        <div class="col-sm-4">
+                            {{ text_field('nroInicial','class': 'form-control','placeholder':'Ingrese el Mínimo','required':'true') }}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="nroFinal" class="col-sm-2 control-label">Nro Final</label>
+                        <div class="col-sm-4">
+                            {{ text_field('nroFinal','class': 'form-control','placeholder':'Ingrese el Máximo','required':'true') }}
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-sm-offset-2 col-sm-10">
+                            <button type="submit" class="btn btn-danger btn-flat">BUSCAR</button>
+                        </div>
+                    </div>
+                    {{ end_form() }}
+                </div>
+                <!-- /.tab-pane -->
+            </div>
+            <!-- /.tab-content -->
+        </div>
+        <!-- /.nav-tabs-custom -->
+    </div>
+    <!-- /.col -->
+
+</section>
