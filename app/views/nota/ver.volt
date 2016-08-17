@@ -41,7 +41,11 @@
                     {{ link_to('nota/editar/'~nota.getIdDocumento(),'<i class="fa fa-pencil"></i> Editar Nota','class':'btn btn-flat btn-block btn-social btn-twitter') }}
                 </div>
                 <div class="form-group">
-                    {{ link_to('nota/eliminar/'~nota.getIdDocumento(),'<i class="fa fa-remove"></i> Eliminar Nota','class':'btn btn-block btn-flat btn-social btn-google') }}
+                    {% if nota.getHabilitado()==1 %}
+                        {{ link_to('nota/eliminar/'~nota.getIdDocumento(),'<i class="fa fa-remove"></i> Eliminar Nota','class':'btn btn-block btn-flat btn-social btn-google') }}
+                    {% else %}
+                        {{ link_to('nota/habilitar/'~nota.getIdDocumento(),'<i class="fa fa-check"></i> Habilitar Nota','class':'btn btn-block btn-flat btn-social btn-success') }}
+                    {% endif %}
                 </div>
             </div>
         </form>

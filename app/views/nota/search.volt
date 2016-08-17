@@ -18,7 +18,13 @@
     {% if page.items is defined %}
     {% for nota in page.items %}
         <tr>
-            <td>{{ link_to('nota/ver/'~nota.getIdDocumento(),'<i class="fa fa-file"></i> ','class':'btn btn-primary btn-flat') }}</td>
+            <td>
+                {% if nota.getHabilitado()==1 %}
+                {{ link_to('nota/ver/'~nota.getIdDocumento(),'<i class="fa fa-file"></i> ','class':'btn btn-primary btn-flat') }}
+                {% else %}
+                    {{ link_to('nota/ver/'~nota.getIdDocumento(),'<i class="fa fa-file"></i> ','class':'btn btn-danger btn-flat') }}
+                {% endif %}
+            </td>
             <td>{{ nota.getNroNota() }}</td>
             <td>{{ date('d/m/Y',(nota.getFecha()) | strtotime) }}</td>
             <td>
