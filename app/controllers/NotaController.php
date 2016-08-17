@@ -7,7 +7,7 @@ class NotaController extends ControllerBase
 {
 
     /**
-     * Index action
+     * Formulario para hacer busquedas
      */
     public function indexAction()
     {
@@ -22,10 +22,8 @@ class NotaController extends ControllerBase
         $this->view->form = new NotaForm(null, array('edit' => true));
     }
 
-
-
     /**
-     * Displays the creation form
+     * Muestra un formulario para crear una nota
      */
     public function newAction()
     {
@@ -42,9 +40,10 @@ class NotaController extends ControllerBase
     }
 
     /**
-     * Edits a nota
+     * Muestra el formulario para editar una nota
      *
      * @param string $id_documento
+     * @return null
      */
     public function editarAction($id_documento)
     {
@@ -61,7 +60,7 @@ class NotaController extends ControllerBase
     }
 
     /**
-     * Creates a new nota
+     * guarda una nota nueva
      */
     public function createAction()
     {
@@ -123,11 +122,11 @@ class NotaController extends ControllerBase
         $form->clear();
         $this->db->commit();
         $this->flashSession->success("La Nota ha sido creada correctamente");
-       return $this->response->redirect('nota/listar');
+        return $this->response->redirect('nota/listar');
     }
 
     /**
-     * Saves a nota edited
+     * Guarda los datos de la nota editada
      *
      */
     public function saveAction()
@@ -162,14 +161,14 @@ class NotaController extends ControllerBase
 
         /*Guardamos el adjunto*/
         $archivos = $this->request->getUploadedFiles();
-       if($archivos[0]->getName()!="") {
-           $nombreCarpeta = 'files/nota/' . date('Ymd') . '/' . $nota->getNroNota();
-           $path = $this->guardarAdjunto($this->request->getUploadedFiles(), $nombreCarpeta);
-           if ($path == "") {
-               $this->flash->error("Ocurrió un problema al guardar el archivo adjunto. Edite la nota para volver a adjuntar el archivo.");
-           }
-           $nota->setNotaAdjunto($path);
-       }
+        if ($archivos[0]->getName() != "") {
+            $nombreCarpeta = 'files/nota/' . date('Ymd') . '/' . $nota->getNroNota();
+            $path = $this->guardarAdjunto($this->request->getUploadedFiles(), $nombreCarpeta);
+            if ($path == "") {
+                $this->flash->error("Ocurrió un problema al guardar el archivo adjunto. Edite la nota para volver a adjuntar el archivo.");
+            }
+            $nota->setNotaAdjunto($path);
+        }
         /*Actualizamos los datos*/
         if ($nota->save() == false) {
             $this->db->rollback();
@@ -188,43 +187,10 @@ class NotaController extends ControllerBase
 
 
     /**
-     * Deletes a nota
-     *
-     * @param string $id_documento
+     * Muestra los datos de la nota y ofrece las operaciones que se pueden realizar sobre la nota.
+     * @param $id_documento
+     * @return null
      */
-    public function deleteAction($id_documento)
-    {
-
-        $nota = Nota::findFirstByid_documento($id_documento);
-        if (!$nota) {
-            $this->flash->error("nota was not found");
-
-            return $this->dispatcher->redireccionar(array(
-                "controller" => "nota",
-                "action" => "index"
-            ));
-        }
-
-        if (!$nota->delete()) {
-
-            foreach ($nota->getMessages() as $message) {
-                $this->flash->error($message);
-            }
-
-            return $this->dispatcher->redireccionar(array(
-                "controller" => "nota",
-                "action" => "search"
-            ));
-        }
-
-        $this->flash->success("nota was deleted successfully");
-
-        return $this->dispatcher->redireccionar(array(
-            "controller" => "nota",
-            "action" => "index"
-        ));
-    }
-
     public function verAction($id_documento)
     {
 
@@ -238,11 +204,19 @@ class NotaController extends ControllerBase
 
     }
 
+    /**
+     * Pregunta si esta seguro de eliminar la nota
+     * @param $id_documento
+     */
     public function eliminarAction($id_documento)
     {
         $this->view->id_documento = $id_documento;
     }
 
+    /**
+     * Elimina la nota de manera logica
+     * @return null
+     */
     public function eliminarLogicoAction()
     {
         if ($this->request->isPost()) {
@@ -295,6 +269,7 @@ class NotaController extends ControllerBase
             }
         }
     }
+
     /* ====================================================
         BUSQUEDAS
     =======================================================*/
@@ -345,19 +320,18 @@ class NotaController extends ControllerBase
             $parameters = array();
         }
         $rol = $this->session->get('auth')['rol_nombre'];
-        $limitarAnio="";
-        if($rol!="ADMINISTRADOR")
-        {
-            $date = date_create(date('Y'). '-01-01');
+        $limitarAnio = "";
+        if ($rol != "ADMINISTRADOR") {
+            $date = date_create(date('Y') . '-01-01');
             $ultimoAno = date_format($date, "Y-m-d");//A pedido. los usuarios normales solo podrán ver las notas del ultimo año.
-            $limitarAnio=  "  '$ultimoAno'  <= fecha ";
+            $limitarAnio = "  '$ultimoAno'  <= fecha ";
         }
         if (isset($parameters['conditions']))
-            if($limitarAnio!="")
+            if ($limitarAnio != "")
                 $parameters['conditions'] .= "AND $limitarAnio ";
-        else
-            if($limitarAnio!="")
-                $parameters['conditions'] = "$limitarAnio ";
+            else
+                if ($limitarAnio != "")
+                    $parameters['conditions'] = "$limitarAnio ";
 
         $parameters["order"] = "id_documento DESC";
 
@@ -375,6 +349,7 @@ class NotaController extends ControllerBase
 
         $this->view->page = $paginator->getPaginate();
     }
+
     public function searchEntreFechasAction()
     {
         $this->setDatatables();
@@ -382,12 +357,11 @@ class NotaController extends ControllerBase
         $numberPage = 1;
 
         $rol = $this->session->get('auth')['rol_nombre'];
-        $limitarAnio="";
-        if($rol!="ADMINISTRADOR")
-        {
-            $date = date_create(date('Y'). '-01-01');
+        $limitarAnio = "";
+        if ($rol != "ADMINISTRADOR") {
+            $date = date_create(date('Y') . '-01-01');
             $ultimoAno = date_format($date, "Y-m-d");//A pedido. los usuarios normales solo podrán ver las notas del ultimo año.
-            $limitarAnio=  "  '$ultimoAno'  <= fecha AND ";
+            $limitarAnio = "  '$ultimoAno'  <= fecha AND ";
         }
         $desde = $this->request->getPost('fecha_desde');
         $hasta = $this->request->getPost('fecha_hasta');
@@ -433,12 +407,11 @@ class NotaController extends ControllerBase
         $numberPage = 1;
 
         $rol = $this->session->get('auth')['rol_nombre'];
-        $limitarAnio="";
-        if($rol!="ADMINISTRADOR")
-        {
-            $date = date_create(date('Y'). '-01-01');
+        $limitarAnio = "";
+        if ($rol != "ADMINISTRADOR") {
+            $date = date_create(date('Y') . '-01-01');
             $ultimoAno = date_format($date, "Y-m-d");//A pedido. los usuarios normales solo podrán ver las notas del ultimo año.
-            $limitarAnio=  " '$ultimoAno'  <= fecha AND ";
+            $limitarAnio = " '$ultimoAno'  <= fecha AND ";
         }
         $desde = $this->request->getPost('nroInicial');
         $hasta = $this->request->getPost('nroFinal');
