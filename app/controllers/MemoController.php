@@ -238,6 +238,20 @@ class MemoController extends ControllerBase
 
 
         $numberPage = $this->request->getQuery("page", "int");
+        /*Control de visualizacion por rol*/
+        $rol = $this->session->get('auth')['rol_nombre'];
+        $limitarAnio = "";
+        if ($rol != "ADMINISTRADOR") {
+            $date = date_create(date('Y') . '-01-01');
+            $ultimoAno = date_format($date, "Y-m-d");//A pedido. los usuarios normales solo podrán ver los memos del ultimo año.
+            $limitarAnio = "  '$ultimoAno'  <= fecha ";
+        }
+        if (isset($parameters['conditions']))
+            if ($limitarAnio != "")
+                $parameters['conditions'] .= "AND $limitarAnio ";
+            else
+                if ($limitarAnio != "")
+                    $parameters['conditions'] = "$limitarAnio ";
         $parameters["order"] = "id_documento DESC";
 
         $nota = Memo::find($parameters);
