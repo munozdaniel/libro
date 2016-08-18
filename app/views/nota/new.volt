@@ -1,18 +1,3 @@
-<style>
-    .modal {
-        position: relative;
-        top: auto;
-        bottom: auto;
-        right: auto;
-        left: auto;
-        display: block;
-        z-index: 1;
-    }
-
-     .modal {
-        background: transparent !important;
-    }
-</style>
 {{ form("nota/create", "method":"post",'id':'nuevo','enctype':'multipart/form-data') }}
 {{ content() }}
 {{ flashSession.output() }}
