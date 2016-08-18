@@ -75,11 +75,11 @@
             <!-- sidebar menu: : style can be found in sidebar.less -->
             <ul class="sidebar-menu">
                 <li class="header">MENÚ PRINCIPAL</li>
-                <li><a href="#"><i class="fa fa-square-o text-red"></i> <span>Notas</span></a></li>
-                <li><a href="#"><i class="fa fa-square-o text-yellow"></i> <span>Memo</span></a></li>
-                <li><a href="#"><i class="fa fa-square-o text-aqua"></i> <span>Resolución</span></a></li>
-                <li><a href="#"><i class="fa fa-square-o text-gray"></i> <span>Disposición</span></a></li>
-                <li><a href="#"><i class="fa fa-square-o text-green"></i> <span>Expedientes</span></a></li>
+                <li>{{ link_to('nota/listar','<i class="fa fa-square-o text-red"></i> <span>Notas</span>') }}</li>
+                <li>{{ link_to('memo/listar','<i class="fa fa-square-o text-yellow"></i> <span>Memo</span>') }}</li>
+                <li>{{ link_to('resolucion/listar','<i class="fa fa-square-o text-aqua"></i> <span>Resolución</span>') }}</li>
+                <li>{{ link_to('disposicion/listar','<i class="fa fa-square-o text-gray"></i> <span>Disposición</span>') }}</li>
+                <li>{{ link_to('expediente/listar','<i class="fa fa-square-o text-green"></i> <span>Expedientes</span>') }}</li>
             </ul>
         </section>
         <!-- /.sidebar -->
