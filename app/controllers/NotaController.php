@@ -20,6 +20,7 @@ class NotaController extends ControllerBase
         $this->assets->collection('footerInlineJs')
             ->addInlineJs(' $(".autocompletar").select2();');
         $this->view->form = new NotaForm(null, array('edit' => true));
+
     }
 
     /**
@@ -34,8 +35,17 @@ class NotaController extends ControllerBase
         $this->assets->collection('footerJs')
             ->addJs('plugins/select2/select2.full.min.js');
         $this->assets->collection('footerInlineJs')
-            ->addInlineJs(' $(".autocompletar").select2();');
-        $this->view->form = new NotaForm(null, array('edit' => true));
+            ->addInlineJs('
+            $(".autocompletar").select2();
+            $(document).ready( function() {
+                var now = new Date();
+                var day = ("0" + now.getDate()).slice(-2);
+                var month = ("0" + (now.getMonth() + 1)).slice(-2);
+                var today = now.getFullYear()+"-"+(month)+"-"+(day) ;
+                $(\'#fecha\').val(today);
+                });
+            ');
+        $this->view->form = new NotaForm(null, array('edit' => true, 'required' => true));
 
     }
 
@@ -216,8 +226,7 @@ class NotaController extends ControllerBase
             $this->flashSession->error("La nota no se encontró");
             return $this->response->redirect("nota/listar");
         }
-        if($nota->getHabilitado()==0)
-        {
+        if ($nota->getHabilitado() == 0) {
             $this->flashSession->warning("La nota ya fue eliminada");
             return $this->response->redirect("nota/listar");
         }
@@ -250,7 +259,7 @@ class NotaController extends ControllerBase
                 //Buscamos el anterior habilitado
                 $band = true;
                 $date = DateTime::createFromFormat("Y-m-d", $nota->getFecha());
-                $anioNota =  $date->format("Y");
+                $anioNota = $date->format("Y");
                 $id = $id_documento;
                 while ($band) {
                     $id_anterior = ($id - 1);
@@ -258,9 +267,8 @@ class NotaController extends ControllerBase
                     if (!$anterior)//Si no existe anterior, entonces empezaria en 0 la siguiente nota que se ingrese
                     {
                         $band = false;//Corta el bucle
-                    }else{
-                        if ($anterior->getHabilitado() == 1)
-                        {
+                    } else {
+                        if ($anterior->getHabilitado() == 1) {
                             $band = false;
                             $anterior->setUltimo(1);
                             if (!$anterior->update()) {
@@ -268,11 +276,11 @@ class NotaController extends ControllerBase
                                 foreach ($nota->getMessages() as $mensaje) {
                                     $this->flash->error($mensaje);
                                 }
-                                return $this->redireccionar('nota/eliminar/'.$id_documento);
+                                return $this->redireccionar('nota/eliminar/' . $id_documento);
                             }
                         }
                     }
-                    $id = ($id-1);
+                    $id = ($id - 1);
                 }
                 $nota->setUltimo(0);
                 $nota->setHabilitado(0);
@@ -281,7 +289,7 @@ class NotaController extends ControllerBase
                     foreach ($nota->getMessages() as $mensaje) {
                         $this->flash->error($mensaje);
                     }
-                    return $this->redireccionar('nota/eliminar/'.$id_documento);
+                    return $this->redireccionar('nota/eliminar/' . $id_documento);
                 }
                 $this->db->commit();
                 $this->flash->success('La nota ' . $nota->getNroNota() . ' ha sido deshabilitada');
@@ -295,7 +303,7 @@ class NotaController extends ControllerBase
                     foreach ($nota->getMessages() as $mensaje) {
                         $this->flash->error($mensaje);
                     }
-                    return $this->redireccionar('nota/eliminar/'.$id_documento);
+                    return $this->redireccionar('nota/eliminar/' . $id_documento);
                 }
                 $this->db->commit();
                 $this->flashSession->success('La nota ' . $nota->getNroNota() . ' ha sido deshabilitada');

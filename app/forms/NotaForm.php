@@ -64,11 +64,11 @@ class NotaForm extends Form {
         $elemento = new Date('fecha',
             array(
                 'class'=>'form-control',
+                'placeholder'=>'FECHA',
                 $opcion['required']=>'',
-                $opcion['readOnly']=>''
+                'readOnly'=>''
             ));
         $elemento->setLabel( $opcion['asterisco'].' Fecha ');
-        $elemento->setFilters(array('striptags', 'string'));
         $elemento->addValidators(array(
             new PresenceOf(array(
                 'message' => 'La Fecha es requerida'
