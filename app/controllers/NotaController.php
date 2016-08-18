@@ -112,6 +112,8 @@ class NotaController extends ControllerBase
         }
         /*Seteamos los campos faltantes*/
         $nota->setHabilitado(1);
+        $nota->setDescripcion(mb_strtoupper($nota->getDescripcion()));
+        $nota->setDestino(mb_strtoupper($nota->getDestino()));
         $nota->setTipo(1);
         /*Guardamos el adjunto*/
         $nombreCarpeta = 'files/nota/' . date('Ymd') . '/' . $nota->getNroNota();
@@ -180,6 +182,8 @@ class NotaController extends ControllerBase
             $nota->setNotaAdjunto($path);
         }
         /*Actualizamos los datos*/
+        $nota->setDescripcion(mb_strtoupper($nota->getDescripcion()));
+        $nota->setDestino(mb_strtoupper($nota->getDestino()));
         if ($nota->save() == false) {
             $this->db->rollback();
             foreach ($nota->getMessages() as $message) {
@@ -326,12 +330,8 @@ class NotaController extends ControllerBase
 
         $nota = Nota::find($parameters);
         if (count($nota) == 0) {
-            $this->flash->notice("The search did not find any nota");
-
-            return $this->dispatcher->redireccionar(array(
-                "controller" => "nota",
-                "action" => "index"
-            ));
+            $this->flashSession->warning("<i class='fa fa-warning'></i> No se encontraron notas cargadas en el sistema");
+            return $this->response->redirect('nota/index');
         }
 
         $paginator = new Paginator(array(
