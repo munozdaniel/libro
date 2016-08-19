@@ -37,4 +37,36 @@ class CaratulaController  extends ControllerBase
         $pdf->Output('nota_'.$nota->getNroNota().'_'.$nota->getFecha().'.pdf', "I");
 
     }
+    public function memoAction($id_documento)
+    {
+        $this->view->disable();
+        $memo = Memo::findFirst('id_documento=' . $id_documento);
+        if (!$memo) {
+            $this->flash->error("El memo no se encontró");
+            return $this->redireccionar("memo/listar");
+        }
+        $this->tag->setTitle('');//Para que no muestre el titulo en el pdf.
+
+        ini_set('max_execution_time', 300); //300 seconds = 5 minutes // si funciona pero la pagina anterior se corrompe
+
+
+
+        // Get the view data
+        if($memo->getDestinosectorIdOid()==1)
+            $destino = $memo->getOtrodestino();
+        else
+            $destino = $memo->getSectorDestino()->getSectorNombre();
+        $html = $this->view->getRender('caratula', 'memo', array(
+            'nro_memo' => $memo->getNroMemo(),
+            'fecha' =>  date('d/m/Y', strtotime($memo->getFecha())),
+            'origen' => $memo->getSectorOrigen()->getSectorNombre(),
+            'descripcion' => $memo->getDescripcion(),
+            'destino' => $destino
+
+        ));
+        $pdf = new mpdf();
+        $pdf->WriteHTML($html, 2);
+        $pdf->Output('nota_'.$memo->getNroMemo().'_'.$memo->getFecha().'.pdf', "I");
+
+    }
 }
