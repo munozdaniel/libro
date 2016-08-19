@@ -271,7 +271,17 @@ class MemoController extends ControllerBase
             "action" => "index"
         ));
     }
+    public function verAction($id_documento)
+    {
+        $memo = Memo::findFirst(array('id_documento=' . $id_documento));
+        if (!$memo) {
+            $this->flash->error("El memo no se encontró");
+            return $this->redireccionar("memo/listar");
+        }
+        $this->view->memo = $memo;
+        $this->view->form = new MemoForm($memo, array('edit' => true, 'readOnly' => true, 'required' => true));
 
+    }
     /* ====================================================
            BUSQUEDAS
        =======================================================*/
