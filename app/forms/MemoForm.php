@@ -124,11 +124,6 @@ class MemoForm extends Form {
             ));
         $elemento->setLabel( $opcion['asterisco'].'Otro Destino');
         $elemento->setFilters(array('striptags', 'string'));
-        $elemento->addValidators(array(
-            new PresenceOf(array(
-                'message' => 'El destino es requerido'
-            ))
-        ));
         $this->add($elemento);
         /*========================== DESCRIPCION ==========================*/
         $elemento = new TextArea('descripcion',

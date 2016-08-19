@@ -1,5 +1,5 @@
 <?php
- 
+
 use Phalcon\Mvc\Model\Criteria;
 use Phalcon\Paginator\Adapter\Model as Paginator;
 
@@ -81,63 +81,89 @@ class MemoController extends ControllerBase
             $this->tag->setDefault("nro", $memo->getNro());
             $this->tag->setDefault("memo_adjunto", $memo->getMemoAdjunto());
             $this->tag->setDefault("memo_ultimaModificacion", $memo->getMemoUltimamodificacion());
-            
+
         }
     }
 
     /**
-     * Creates a new memo
+     * Guardar un nuevo memo
      */
     public function createAction()
     {
 
         if (!$this->request->isPost()) {
-            return $this->dispatcher->forward(array(
-                "controller" => "memo",
-                "action" => "index"
-            ));
+            return $this->redireccionar("memo/listar");
         }
-
+        $this->db->begin();
+        $form = new MemoForm;
         $memo = new Memo();
-
-        $memo->setDestinosectorIdOid($this->request->getPost("destinosector_id_oid"));
-        $memo->setNroMemo($this->request->getPost("nro_memo"));
-        $memo->setOtrodestino($this->request->getPost("otrodestino"));
-        $memo->setAdjunto($this->request->getPost("adjunto"));
-        $memo->setAdjuntar($this->request->getPost("adjuntar"));
-        $memo->setAdjuntar0($this->request->getPost("adjuntar_0"));
-        $memo->setCreadopor($this->request->getPost("creadopor"));
-        $memo->setDescripcion($this->request->getPost("descripcion"));
-        $memo->setFecha($this->request->getPost("fecha"));
-        $memo->setHabilitado($this->request->getPost("habilitado"));
-        $memo->setSectorIdOid($this->request->getPost("sector_id_oid"));
-        $memo->setTipo($this->request->getPost("tipo"));
-        $memo->setUltimo($this->request->getPost("ultimo"));
-        $memo->setUltimodelanio($this->request->getPost("ultimodelanio"));
-        $memo->setVersion($this->request->getPost("version"));
-        $memo->setNro($this->request->getPost("nro"));
-        $memo->setMemoAdjunto($this->request->getPost("memo_adjunto"));
-        $memo->setMemoUltimamodificacion($this->request->getPost("memo_ultimaModificacion"));
-        
-
-        if (!$memo->save()) {
-            foreach ($memo->getMessages() as $message) {
-                $this->flash->error($message);
+        // Recuperamos los datos por post y seteanmos la entidad
+        $data = $this->request->getPost();
+        $form->bind($data, $memo);
+        /*Obtenemos el ultimo numero de nota*/
+        $ultimo = Memo::findFirst("ultimo=1");
+        if (!$ultimo) {
+            $memo->setNroMemo(1);
+            $memo->setUltimo(1);
+        } else {
+            $ultimo->setUltimo(0);
+            if (!$ultimo->update()) {
+                $this->db->rollback();
+                foreach ($ultimo->getMessages() as $message) {
+                    $this->flash->error($message);
+                }
+                return $this->redireccionar('memo/new');
+            }
+            $memo->setNroMemo($ultimo->getNroMemo() + 1);
+            $memo->setUltimo(1);
+            /*Validamos el formulario*/
+            if (!$form->isValid()) {
+                $this->db->rollback();
+                foreach ($form->getMessages() as $message) {
+                    $this->flash->error($message);
+                }
+                return $this->redireccionar('memo/new');
+            }
+            /*Seteamos los campos faltantes*/
+            $memo->setHabilitado(1);
+            $memo->setDescripcion(mb_strtoupper($memo->getDescripcion()));
+            if($memo->getDestinosectorIdOid()==1)
+                if(trim($memo->getOtrodestino())!="")
+                    $memo->setOtrodestino(mb_strtoupper($memo->getOtrodestino()));
+                else
+                {
+                    $this->flash->error("Ingrese el destino");
+                    return $this->redireccionar('memo/new');
+                }
+            else
+                $memo->setOtrodestino(null);
+            $memo->setTipo(2);
+            /*Guardamos el adjunto*/
+            $archivos = $this->request->getUploadedFiles();
+            if ($archivos[0]->getName() != "") {
+                $nombreCarpeta = 'files/memo/' . date('Ymd') . '/' . $memo->getNroMemo();
+                $path = $this->guardarAdjunto($archivos, $nombreCarpeta);
+                if ($path == "") {
+                    $this->flashSession->error("Edite el memo para volver a adjuntar el archivo.");
+                }
+                else {
+                    $memo->setMemoAdjunto($path);
+                }
+            }
+            /*Guardamos la instancia en la bd*/
+            if ($memo->save() == false) {
+                $this->db->rollback();
+                foreach ($memo->getMessages() as $message) {
+                    $this->flash->error($message);
+                }
+                return $this->redireccionar('memo/new');
             }
 
-            return $this->dispatcher->forward(array(
-                "controller" => "memo",
-                "action" => "new"
-            ));
+            $form->clear();
+            $this->db->commit();
+            $this->flashSession->success("El Memo ha sido creado correctamente");
+            return $this->response->redirect('memo/listar');
         }
-
-        $this->flash->success("memo was created successfully");
-
-        return $this->dispatcher->forward(array(
-            "controller" => "memo",
-            "action" => "index"
-        ));
-
     }
 
     /**
@@ -184,7 +210,7 @@ class MemoController extends ControllerBase
         $memo->setNro($this->request->getPost("nro"));
         $memo->setMemoAdjunto($this->request->getPost("memo_adjunto"));
         $memo->setMemoUltimamodificacion($this->request->getPost("memo_ultimaModificacion"));
-        
+
 
         if (!$memo->save()) {
 
@@ -245,6 +271,7 @@ class MemoController extends ControllerBase
             "action" => "index"
         ));
     }
+
     /* ====================================================
            BUSQUEDAS
        =======================================================*/
@@ -330,12 +357,13 @@ class MemoController extends ControllerBase
 
         $paginator = new Paginator(array(
             "data" => $memo,
-            "limit"=> 10,
+            "limit" => 10,
             "page" => $numberPage
         ));
 
         $this->view->page = $paginator->getPaginate();
     }
+
     public function searchEntreFechasAction()
     {
         $this->setDatatables();
