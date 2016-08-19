@@ -19,7 +19,7 @@
 
 
 </div>
-<div class="col-md-5">
+<div class="col-md-4">
     <div class="form-group">
         {{ form.label('sector_id_oid',{'class':'btn-block'}) }}
         {{ form.render('sector_id_oid') }}
@@ -94,11 +94,13 @@
         {{ form.label('descripcion',{'class':'btn-block'}) }}
         {{ form.render('descripcion') }}
     </div>
+    </div>
+    <div class="col-md-4">
 
     <div class="form-group">
         <label for="memo_adjunto">Adjuntar Archivo</label>
         <input type="file"  id="memo_adjunto" name="nota_adjunto">
-        <p class="help-block">Los archivos permitidos son: PDF - EXCEL - WORD.</p>
+        <p class="help-block">PDF - EXCEL - WORD.</p>
     </div>
 
     <div class="form-group">
