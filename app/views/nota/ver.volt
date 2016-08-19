@@ -11,7 +11,7 @@
             </div>
         {% endif %}
     {% endfor %}
-    <label for="creadopor" class="btn-block"> Adjunto</label>
+    <label for="nota_adjunto" class="btn-block"> Adjunto</label>
 
     <div class="input-group ">
         <div class="input-group-btn">

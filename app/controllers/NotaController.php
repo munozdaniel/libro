@@ -93,7 +93,7 @@ class NotaController extends ControllerBase
             $ultimo->setUltimo(0);
             if (!$ultimo->update()) {
                 $this->db->rollback();
-                foreach ($nota->getMessages() as $message) {
+                foreach ($ultimo->getMessages() as $message) {
                     $this->flash->error($message);
                 }
                 return $this->redireccionar('nota/new');
@@ -283,7 +283,7 @@ class NotaController extends ControllerBase
                             $anterior->setUltimo(1);
                             if (!$anterior->update()) {
                                 $this->db->rollback();
-                                foreach ($nota->getMessages() as $mensaje) {
+                                foreach ($anterior->getMessages() as $mensaje) {
                                     $this->flash->error($mensaje);
                                 }
                                 return $this->redireccionar('nota/eliminar/' . $id_documento);
