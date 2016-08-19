@@ -76,7 +76,7 @@ class MemoForm extends Form {
         ));
         $this->add($elemento);
         /*========================== SECTOR ORIGEN ==========================*/
-        $elemento = new Select('sector_id_oid',  Sectores::find(), array(
+        $elemento = new Select('sector_id_oid',  Sectores::find(array('sector_activo=1 AND sector_id!=1')), array(
             'using'      => array('sector_id', 'sector_nombre'),
             'useEmpty'   => true,
             'emptyText'  => 'Seleccionar ',
@@ -95,7 +95,7 @@ class MemoForm extends Form {
         $elemento->setLabel( $opcion['asterisco'].'Sector Origen');
         $this->add($elemento);
         /*========================== SECTOR DESTINO ==========================*/
-        $elemento = new Select('destinosector_id_oid',  Sectores::find(), array(
+        $elemento = new Select('destinosector_id_oid',  Sectores::find(array('sector_activo=1')), array(
             'using'      => array('sector_id', 'sector_nombre'),
             'useEmpty'   => true,
             'emptyText'  => 'Seleccionar ',
