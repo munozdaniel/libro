@@ -101,6 +101,7 @@ class MemoForm extends Form {
             'emptyText'  => 'Seleccionar ',
             'emptyValue' => '',
             'class'      => 'form-control autocompletar',
+            'onchange'  =>'controlarOtroSector(this)',
             $opcion['required']=>'',
             $opcion['readOnly']=>'',
             $opcion['disabled']=>'',
@@ -119,10 +120,9 @@ class MemoForm extends Form {
                 'class'=>'form-control',
                 'placeholder'=>'Ingrese el destino',
                 'maxlength'=>70,
-                $opcion['required']=>'',
                 $opcion['readOnly']=>''
             ));
-        $elemento->setLabel( $opcion['asterisco'].' Destino');
+        $elemento->setLabel( $opcion['asterisco'].'Otro Destino');
         $elemento->setFilters(array('striptags', 'string'));
         $elemento->addValidators(array(
             new PresenceOf(array(

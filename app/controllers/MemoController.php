@@ -20,7 +20,24 @@ class MemoController extends ControllerBase
      */
     public function newAction()
     {
+        $this->persistent->parameters = null;
 
+        $this->assets->collection('headerCss')
+            ->addCss('plugins/select2/select2.min.css');
+        $this->assets->collection('footerJs')
+            ->addJs('plugins/select2/select2.full.min.js');
+        $this->assets->collection('footerInlineJs')
+            ->addInlineJs('
+            $(".autocompletar").select2();
+            $(document).ready( function() {
+                var now = new Date();
+                var day = ("0" + now.getDate()).slice(-2);
+                var month = ("0" + (now.getMonth() + 1)).slice(-2);
+                var today = now.getFullYear()+"-"+(month)+"-"+(day) ;
+                $(\'#fecha\').val(today);
+                });
+            ');
+        $this->view->form = new MemoForm(null, array('edit' => true, 'required' => true));
     }
 
     /**
