@@ -71,7 +71,7 @@ class ControllerBase extends Controller
             #move the file and simultaneously check if everything was ok
             ($archivo->moveTo($path)) ? $band= true : $band = false;
             if (!$band)
-                echo "No se pudo guardar los archivos adjuntos.";
+                echo "No se pudo guardar el archivo $nombreArchivo.";
             else {
                 $retorno = $path;
             }

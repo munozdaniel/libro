@@ -116,12 +116,18 @@ class NotaController extends ControllerBase
         $nota->setDestino(mb_strtoupper($nota->getDestino()));
         $nota->setTipo(1);
         /*Guardamos el adjunto*/
-        $nombreCarpeta = 'files/nota/' . date('Ymd') . '/' . $nota->getNroNota();
-        $path = $this->guardarAdjunto($this->request->getUploadedFiles(), $nombreCarpeta);
-        if ($path == "") {
-            $this->flashSession->error("Ocurrió un problema al guardar el archivo adjunto. Edite la nota para volver a adjuntar el archivo.");
+        $archivos = $this->request->getUploadedFiles();
+        if ($archivos[0]->getName() != "") {
+
+            $nombreCarpeta = 'files/nota/' . date('Ymd') . '/' . $nota->getNroNota();
+            $path = $this->guardarAdjunto($archivos, $nombreCarpeta);
+            if ($path == "") {
+                $this->flashSession->error("Edite la nota para volver a adjuntar el archivo.");
+            }
+            else{
+                $nota->setNotaAdjunto($path);
+            }
         }
-        $nota->setNotaAdjunto($path);
         /*Guardamos la instancia en la bd*/
         if ($nota->save() == false) {
             $this->db->rollback();
