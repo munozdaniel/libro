@@ -100,7 +100,7 @@ class MemoController extends ControllerBase
         // Recuperamos los datos por post y seteanmos la entidad
         $data = $this->request->getPost();
         $form->bind($data, $memo);
-        /*Obtenemos el ultimo numero de nota*/
+        /*Obtenemos el ultimo numero de memo*/
         $ultimo = Memo::findFirst("ultimo=1");
         if (!$ultimo) {
             $memo->setNroMemo(1);
@@ -282,6 +282,103 @@ class MemoController extends ControllerBase
         $this->view->form = new MemoForm($memo, array('edit' => true, 'readOnly' => true, 'required' => true));
 
     }
+    /**
+     * Pregunta si esta seguro de eliminar la memo
+     * @param $id_documento
+     * @return null
+     */
+    public function eliminarAction($id_documento)
+    {
+        $memo = Memo::findFirst('id_documento=' . $id_documento);
+        if (!$memo) {
+            $this->flashSession->error("El memo no se encontró");
+            return $this->response->redirect("memo/listar");
+        }
+        if ($memo->getHabilitado() == 0) {
+            $this->flashSession->warning("El memo ya fue eliminado");
+            return $this->response->redirect("memo/listar");
+        }
+        $this->view->id_documento = $id_documento;
+    }
+
+
+    /**
+     * Elimina la memo de manera logica
+     * Si es la ultima memo: la memo anterior  debera convertirse en la ultima para que la numeracion continue.
+     * (debe ser del mismo año que la memo a eliminar)
+     * Si no es la ultima memo: se la deshabilita nada mas.
+     * @return null
+     */
+    public function eliminarLogicoAction()
+    {
+        if ($this->request->isPost()) {
+            $id_documento = $this->request->getPost('id_documento', 'int');
+
+            $memo = Memo::findFirst('id_documento=' . $id_documento);
+            if (!$memo) {
+                $this->flashSession->warning("El memo no se encontró");
+                return $this->response->redirect("memo/listar");
+            }
+            $this->db->begin();
+            if ($memo->getUltimo() == 1) {
+
+                /*Si es el ultimo, al anteultimo se lo deja ultimo, para que el
+                 siguiente que se agregue continue con la numeracion*/
+                //Buscamos el anterior habilitado
+                $band = true;
+                $date = DateTime::createFromFormat("Y-m-d", $memo->getFecha());
+                $anio = $date->format("Y");
+                $id = $id_documento;
+                while ($band) {
+                    $id_anterior = ($id - 1);
+                    $anterior = Memo::findFirst('id_documento=' . $id_anterior . " AND fecha BETWEEN '$anio-01-01' AND '$anio-12-31'");
+                    if (!$anterior)//Si no existe anterior, entonces empezaria en 0 la siguiente memo que se ingrese
+                    {
+                        $band = false;//Corta el bucle
+                    } else {
+                        if ($anterior->getHabilitado() == 1) {
+                            $band = false;
+                            $anterior->setUltimo(1);
+                            if (!$anterior->update()) {
+                                $this->db->rollback();
+                                foreach ($anterior->getMessages() as $mensaje) {
+                                    $this->flash->error($mensaje);
+                                }
+                                return $this->redireccionar('memo/eliminar/' . $id_documento);
+                            }
+                        }
+                    }
+                    $id = ($id - 1);
+                }
+                $memo->setUltimo(0);
+                $memo->setHabilitado(0);
+                if (!$memo->update()) {
+                    $this->db->rollback();
+                    foreach ($memo->getMessages() as $mensaje) {
+                        $this->flash->error($mensaje);
+                    }
+                    return $this->redireccionar('memo/eliminar/' . $id_documento);
+                }
+                $this->db->commit();
+                $this->flash->success('El memo ' . $memo->getNroMemo() . ' ha sido deshabilitado');
+
+            } else {
+                /*Si no es el ultimo, se deshabilita*/
+                $memo->setUltimo(0);
+                $memo->setHabilitado(0);
+                if (!$memo->update()) {
+                    $this->db->rollback();
+                    foreach ($memo->getMessages() as $mensaje) {
+                        $this->flash->error($mensaje);
+                    }
+                    return $this->redireccionar('memo/eliminar/' . $id_documento);
+                }
+                $this->db->commit();
+                $this->flashSession->success('El memo ' . $memo->getNroMemo() . ' ha sido deshabilitado');
+            }
+        }
+        return $this->response->redirect("memo/listar");
+    }
     /* ====================================================
            BUSQUEDAS
        =======================================================*/
@@ -308,14 +405,14 @@ class MemoController extends ControllerBase
                     $parameters['conditions'] = "$limitarAnio ";
         $parameters["order"] = "id_documento DESC";
 
-        $nota = Memo::find($parameters);
-        if (count($nota) == 0) {
+        $memo = Memo::find($parameters);
+        if (count($memo) == 0) {
             $this->flashSession->warning("<i class='fa fa-warning'></i> No se encontraron memo cargados en el sistema que coincidan con su búsqueda");
             return $this->response->redirect('memo/index');
         }
 
         $paginator = new Paginator(array(
-            "data" => $nota,
+            "data" => $memo,
             "limit" => 10,
             "page" => $numberPage
         ));
@@ -324,7 +421,7 @@ class MemoController extends ControllerBase
     }
 
     /**
-     * Busqueda de notas
+     * Busqueda de memos
      */
     public function searchAction()
     {
@@ -434,14 +531,14 @@ class MemoController extends ControllerBase
         $limitarAnio = "";
         if ($rol != "ADMINISTRADOR") {
             $date = date_create(date('Y') . '-01-01');
-            $ultimoAno = date_format($date, "Y-m-d");//A pedido. los usuarios normales solo podrán ver las notas del ultimo año.
+            $ultimoAno = date_format($date, "Y-m-d");//A pedido. los usuarios normales solo podrán ver las memos del ultimo año.
             $limitarAnio = " '$ultimoAno'  <= fecha AND ";
         }
         $desde = $this->request->getPost('nroInicial');
         $hasta = $this->request->getPost('nroFinal');
         if ($this->request->isPost()) {
 
-            $query = Criteria::fromInput($this->di, "Nota", $_POST);
+            $query = Criteria::fromInput($this->di, "Memo", $_POST);
             $this->persistent->parameters = $query->getParams();
         } else {
             $numberPage = $this->request->getQuery("page", "int");
@@ -455,14 +552,14 @@ class MemoController extends ControllerBase
 
         if ($desde != null && $hasta != null) {
             if (isset($parameters['conditions']))
-                $parameters['conditions'] .= " AND $limitarAnio  nro_memo >= $desde AND nro_nota <= $hasta";
+                $parameters['conditions'] .= " AND $limitarAnio  nro_memo >= $desde AND nro_memo <= $hasta";
             else
-                $parameters['conditions'] = "$limitarAnio  nro_memo >= $desde AND nro_nota <= $hasta";
+                $parameters['conditions'] = "$limitarAnio  nro_memo >= $desde AND nro_memo <= $hasta";
         }
         $memo = Memo::find($parameters);
         if (count($memo) == 0) {
             $this->flashSession->warning("<i class='fa fa-warning'></i> No se encontraron memo cargados en el sistema que coincidan con su búsqueda");
-            return $this->response->redirect('nota/index');
+            return $this->response->redirect('memo/index');
         }
 
         $paginator = new Paginator(array(
