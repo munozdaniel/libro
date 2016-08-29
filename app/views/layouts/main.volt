@@ -3,7 +3,7 @@
 
     <header class="main-header">
         <!-- Logo -->
-        <a href="../../index2.html" class="logo">
+        <a class="logo">
             <!-- mini logo for sidebar mini 50x50 pixels -->
             <span class="logo-mini"><b>L</b>N</span>
             <!-- logo for regular state and mobile devices -->
@@ -77,7 +77,7 @@
                 <li class="header">MENÚ PRINCIPAL</li>
                 <li>{{ link_to('nota/listar','<i class="fa fa-square-o text-red"></i> <span>Notas</span>') }}</li>
                 <li>{{ link_to('memo/listar','<i class="fa fa-square-o text-yellow"></i> <span>Memo</span>') }}</li>
-                <li>{{ link_to('resolucion/listar','<i class="fa fa-square-o text-aqua"></i> <span>Resolución</span>') }}</li>
+                <li>{{ link_to('resoluciones/listar','<i class="fa fa-square-o text-aqua"></i> <span>Resolución</span>') }}</li>
                 <li>{{ link_to('disposicion/listar','<i class="fa fa-square-o text-gray"></i> <span>Disposición</span>') }}</li>
                 <li>{{ link_to('expediente/listar','<i class="fa fa-square-o text-green"></i> <span>Expedientes</span>') }}</li>
             </ul>
