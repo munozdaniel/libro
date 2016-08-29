@@ -45,44 +45,25 @@ class MemoController extends ControllerBase
      *
      * @param string $id_documento
      */
-    public function editAction($id_documento)
+    public function editarAction($id_documento)
     {
+        $this->assets->collection('headerCss')
+            ->addCss('plugins/select2/select2.min.css');
+        $this->assets->collection('footerJs')
+            ->addJs('plugins/select2/select2.full.min.js');
+        $this->assets->collection('footerInlineJs')
+            ->addInlineJs('
+            $(".autocompletar").select2();
 
-        if (!$this->request->isPost()) {
-
-            $memo = Memo::findFirstByid_documento($id_documento);
-            if (!$memo) {
-                $this->flash->error("memo was not found");
-
-                return $this->dispatcher->forward(array(
-                    "controller" => "memo",
-                    "action" => "index"
-                ));
-            }
-
-            $this->view->id_documento = $memo->id_documento;
-
-            $this->tag->setDefault("id_documento", $memo->getIdDocumento());
-            $this->tag->setDefault("destinosector_id_oid", $memo->getDestinosectorIdOid());
-            $this->tag->setDefault("nro_memo", $memo->getNroMemo());
-            $this->tag->setDefault("otrodestino", $memo->getOtrodestino());
-            $this->tag->setDefault("adjunto", $memo->getAdjunto());
-            $this->tag->setDefault("adjuntar", $memo->getAdjuntar());
-            $this->tag->setDefault("adjuntar_0", $memo->getAdjuntar0());
-            $this->tag->setDefault("creadopor", $memo->getCreadopor());
-            $this->tag->setDefault("descripcion", $memo->getDescripcion());
-            $this->tag->setDefault("fecha", $memo->getFecha());
-            $this->tag->setDefault("habilitado", $memo->getHabilitado());
-            $this->tag->setDefault("sector_id_oid", $memo->getSectorIdOid());
-            $this->tag->setDefault("tipo", $memo->getTipo());
-            $this->tag->setDefault("ultimo", $memo->getUltimo());
-            $this->tag->setDefault("ultimodelanio", $memo->getUltimodelanio());
-            $this->tag->setDefault("version", $memo->getVersion());
-            $this->tag->setDefault("nro", $memo->getNro());
-            $this->tag->setDefault("memo_adjunto", $memo->getMemoAdjunto());
-            $this->tag->setDefault("memo_ultimaModificacion", $memo->getMemoUltimamodificacion());
-
+            ');
+        $memo = Memo::findFirst(array('id_documento=' . $id_documento));
+        if (!$memo) {
+            $this->flash->error("El memo no se encontró");
+            return $this->redireccionar("memo/search");
         }
+        $this->view->memo = $memo;
+        $this->view->form = new MemoForm($memo, array('edit' => true, 'required' => true));
+
     }
 
     /**
@@ -127,12 +108,14 @@ class MemoController extends ControllerBase
             /*Seteamos los campos faltantes*/
             $memo->setHabilitado(1);
             $memo->setDescripcion(mb_strtoupper($memo->getDescripcion()));
+
             if($memo->getDestinosectorIdOid()==1)
-                if(trim($memo->getOtrodestino())!="")
-                    $memo->setOtrodestino(mb_strtoupper($memo->getOtrodestino()));
+                if(trim($this->request->getPost('otrodestino'))!="")
+                    $memo->setOtrodestino(mb_strtoupper($this->request->getPost('otrodestino')));
                 else
                 {
-                    $this->flash->error("Ingrese el destino");
+                    $this->flash->error("Ingrese otro destino");
+                    $form->clear(array('destinosector_id_oid'));
                     return $this->redireccionar('memo/new');
                 }
             else
@@ -174,63 +157,59 @@ class MemoController extends ControllerBase
     {
 
         if (!$this->request->isPost()) {
-            return $this->dispatcher->forward(array(
-                "controller" => "memo",
-                "action" => "index"
-            ));
+            return $this->redireccionar("memo/listar");
         }
 
-        $id_documento = $this->request->getPost("id_documento");
+        $id = $this->request->getPost("id_documento", "int");
 
-        $memo = Memo::findFirstByid_documento($id_documento);
+        $memo = Memo::findFirst("id_documento=" .$id);
         if (!$memo) {
-            $this->flash->error("memo does not exist " . $id_documento);
+            $this->flash->error("El memo no pudo ser editado.");
+            return $this->redireccionar("memo/listar");
 
-            return $this->dispatcher->forward(array(
-                "controller" => "memo",
-                "action" => "index"
-            ));
         }
+        $this->db->begin();
+        /*Validamos el formulario*/
+        $form = new MemoForm;
+        $this->view->form = $form;
+        $data = $this->request->getPost();
+        $form->bind($data, $memo);
+        /*Validamos el formulario*/
+        if (!$form->isValid()) {
+            $this->db->rollback();
+            foreach ($form->getMessages() as $message) {
+                $this->flash->error($message);
+            }
+            return $this->redireccionar('memo/editar/' . $id);
+        }
+        /*Guardamos el adjunto*/
+        $archivos = $this->request->getUploadedFiles();
+        if ($archivos[0]->getName() != "") {
+            $nombreCarpeta = 'files/memo/' . date('Ymd') . '/' . $memo->getNroMemo();
+            $path = $this->guardarAdjunto($this->request->getUploadedFiles(), $nombreCarpeta);
+            if ($path == "") {
+                $this->flash->error("Ocurrió un problema al guardar el archivo adjunto. Edite el memo para volver a adjuntar el archivo.");
+            }
+            $memo->setMemoAdjunto($path);
+        }
+        /*Actualizamos los datos*/
+        $memo->setDescripcion(mb_strtoupper($memo->getDescripcion()));
+        if($memo->getDestinosectorIdOid()==1)
+            $memo->setOtrodestino(mb_strtoupper($memo->getOtrodestino()));
 
-        $memo->setDestinosectorIdOid($this->request->getPost("destinosector_id_oid"));
-        $memo->setNroMemo($this->request->getPost("nro_memo"));
-        $memo->setOtrodestino($this->request->getPost("otrodestino"));
-        $memo->setAdjunto($this->request->getPost("adjunto"));
-        $memo->setAdjuntar($this->request->getPost("adjuntar"));
-        $memo->setAdjuntar0($this->request->getPost("adjuntar_0"));
-        $memo->setCreadopor($this->request->getPost("creadopor"));
-        $memo->setDescripcion($this->request->getPost("descripcion"));
-        $memo->setFecha($this->request->getPost("fecha"));
-        $memo->setHabilitado($this->request->getPost("habilitado"));
-        $memo->setSectorIdOid($this->request->getPost("sector_id_oid"));
-        $memo->setTipo($this->request->getPost("tipo"));
-        $memo->setUltimo($this->request->getPost("ultimo"));
-        $memo->setUltimodelanio($this->request->getPost("ultimodelanio"));
-        $memo->setVersion($this->request->getPost("version"));
-        $memo->setNro($this->request->getPost("nro"));
-        $memo->setMemoAdjunto($this->request->getPost("memo_adjunto"));
-        $memo->setMemoUltimamodificacion($this->request->getPost("memo_ultimaModificacion"));
-
-
-        if (!$memo->save()) {
-
+        if ($memo->save() == false) {
+            $this->db->rollback();
             foreach ($memo->getMessages() as $message) {
                 $this->flash->error($message);
             }
-
-            return $this->dispatcher->forward(array(
-                "controller" => "memo",
-                "action" => "edit",
-                "params" => array($memo->id_documento)
-            ));
+            return $this->redireccionar('memo/editar/' . $id);
         }
 
-        $this->flash->success("memo was updated successfully");
+        $form->clear();
 
-        return $this->dispatcher->forward(array(
-            "controller" => "memo",
-            "action" => "index"
-        ));
+        $this->db->commit();
+        $this->flashSession->success("El Memo ha sido actualizado correctamente");
+        return $this->response->redirect('memo/listar');
 
     }
 
@@ -273,6 +252,15 @@ class MemoController extends ControllerBase
     }
     public function verAction($id_documento)
     {
+        $this->assets->collection('headerCss')
+            ->addCss('plugins/select2/select2.min.css');
+        $this->assets->collection('footerJs')
+            ->addJs('plugins/select2/select2.full.min.js');
+        $this->assets->collection('footerInlineJs')
+            ->addInlineJs('
+            $(".autocompletar").select2();
+
+            ');
         $memo = Memo::findFirst(array('id_documento=' . $id_documento));
         if (!$memo) {
             $this->flash->error("El memo no se encontró");
