@@ -12,6 +12,17 @@ class MemoController extends ControllerBase
     public function indexAction()
     {
         $this->persistent->parameters = null;
+
+        $this->assets->collection('headerCss')
+            ->addCss('plugins/select2/select2.min.css');
+        $this->assets->collection('footerJs')
+            ->addJs('plugins/select2/select2.full.min.js');
+        $this->assets->collection('footerInlineJs')
+            ->addInlineJs(' $(".autocompletar").select2();');
+        $this->view->form = new MemoForm(null, array('edit' => true));
+
+        $memo = Memo::find();
+        $this->view->memo = $memo;
     }
 
 
