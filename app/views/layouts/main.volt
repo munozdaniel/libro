@@ -75,11 +75,71 @@
             <!-- sidebar menu: : style can be found in sidebar.less -->
             <ul class="sidebar-menu">
                 <li class="header">MENÚ PRINCIPAL</li>
-                <li>{{ link_to('nota/listar','<i class="fa fa-square-o text-red"></i> <span>Notas</span>') }}</li>
-                <li>{{ link_to('memo/listar','<i class="fa fa-square-o text-yellow"></i> <span>Memo</span>') }}</li>
-                <li>{{ link_to('resoluciones/listar','<i class="fa fa-square-o text-aqua"></i> <span>Resolución</span>') }}</li>
-                <li>{{ link_to('disposicion/listar','<i class="fa fa-square-o text-gray"></i> <span>Disposición</span>') }}</li>
-                <li>{{ link_to('expediente/listar','<i class="fa fa-square-o text-green"></i> <span>Expedientes</span>') }}</li>
+                <li class="treeview ">
+                    <a href="#">
+                        <i class="fa fa-folder-o text-red"></i> <span>NOTAS</span>
+                            <span class="pull-right-container">
+                              <i class="fa fa-angle-left pull-right"></i>
+                            </span>
+                    </a>
+                    <ul class="treeview-menu">
+                        <li>{{ link_to('nota/listar','<i class="fa fa-circle-o "></i> <span>Listado</span>') }}</li>
+                        <li>{{ link_to('nota/new','<i class="fa fa-circle-o "></i> <span>Nuevo</span>') }}</li>
+                        <li>{{ link_to('nota/index','<i class="fa fa-circle-o "></i> <span>Buscar</span>') }}</li>
+                    </ul>
+                </li>
+                <li class="treeview ">
+                    <a href="#">
+                        <i class="fa fa-folder-o text-yellow"></i> <span>MEMO</span>
+                            <span class="pull-right-container">
+                              <i class="fa fa-angle-left pull-right"></i>
+                            </span>
+                    </a>
+                    <ul class="treeview-menu">
+                        <li>{{ link_to('memo/listar','<i class="fa fa-circle-o "></i> <span>Listado</span>') }}</li>
+                        <li>{{ link_to('memo/new','<i class="fa fa-circle-o "></i> <span>Nuevo</span>') }}</li>
+                        <li>{{ link_to('memo/index','<i class="fa fa-circle-o "></i> <span>Buscar</span>') }}</li>
+                    </ul>
+                </li>
+                <li class="treeview ">
+                    <a href="#">
+                        <i class="fa fa-folder-o text-blue"></i> <span>RESOLUCIONES</span>
+                            <span class="pull-right-container">
+                              <i class="fa fa-angle-left pull-right"></i>
+                            </span>
+                    </a>
+                    <ul class="treeview-menu">
+                        <li>{{ link_to('resoluciones/listar','<i class="fa fa-circle-o "></i> <span>Listado</span>') }}</li>
+                        <li>{{ link_to('resoluciones/new','<i class="fa fa-circle-o "></i> <span>Nuevo</span>') }}</li>
+                        <li>{{ link_to('resoluciones/index','<i class="fa fa-circle-o "></i> <span>Buscar</span>') }}</li>
+                    </ul>
+                </li>
+                <li class="treeview ">
+                    <a href="#">
+                        <i class="fa fa-folder-o text-gray"></i> <span>DISPOSICIONES</span>
+                            <span class="pull-right-container">
+                              <i class="fa fa-angle-left pull-right"></i>
+                            </span>
+                    </a>
+                    <ul class="treeview-menu">
+                        <li>{{ link_to('disposicion/listar','<i class="fa fa-circle-o "></i> <span>Listado</span>') }}</li>
+                        <li>{{ link_to('disposicion/new','<i class="fa fa-circle-o "></i> <span>Nuevo</span>') }}</li>
+                        <li>{{ link_to('disposicion/index','<i class="fa fa-circle-o "></i> <span>Buscar</span>') }}</li>
+                    </ul>
+                </li>
+                <li class="treeview ">
+                    <a href="#">
+                        <i class="fa fa-folder-o text-green"></i> <span>EXPEDIENTES</span>
+                            <span class="pull-right-container">
+                              <i class="fa fa-angle-left pull-right"></i>
+                            </span>
+                    </a>
+                    <ul class="treeview-menu">
+                        <li>{{ link_to('expediente/listar','<i class="fa fa-circle-o "></i> <span>Listado</span>') }}</li>
+                        <li>{{ link_to('expediente/new','<i class="fa fa-circle-o "></i> <span>Nuevo</span>') }}</li>
+                        <li>{{ link_to('expediente/index','<i class="fa fa-circle-o "></i> <span>Buscar</span>') }}</li>
+                    </ul>
+                </li>
             </ul>
         </section>
         <!-- /.sidebar -->
@@ -92,7 +152,8 @@
         <div class="pull-right hidden-xs">
             <b>Version</b> 3.0
         </div>
-        <strong>Copyright &copy; 2014-2016 <a href="http://imps.org.ar">IMPS</a>.</strong> Todos los derechos reservados.
+        <strong>Copyright &copy; 2014-2016 <a href="http://imps.org.ar">IMPS</a>.</strong> Todos los derechos
+        reservados.
     </footer>
 
     <!-- Control Sidebar -->
@@ -134,7 +195,7 @@
 
                     <div class="form-group">
                         <label class="control-sidebar-subheading">
-                           Ver Usuarios
+                            Ver Usuarios
                             {{ link_to('','<i class="fa fa-arrow-right"></i>','class':'pull-right') }}
                         </label>
 
