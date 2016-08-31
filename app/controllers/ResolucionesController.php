@@ -202,6 +202,23 @@ class ResolucionesController extends ControllerBase
             "action" => "index"
         ));
     }
+    /**
+     * Muestra los datos de la resolucion y ofrece las operaciones que se pueden realizar sobre la misma.
+     * @param $id_documento
+     * @return null
+     */
+    public function verAction($id_documento)
+    {
+
+        $documento = Resoluciones::findFirst(array('id_documento=' . $id_documento));
+        if (!$documento) {
+            $this->flash->error("La nota no se encontró");
+            return $this->redireccionar("nota/listar");
+        }
+        $this->view->resolucion = $documento;
+        $this->view->form = new ResolucionesForm($documento, array('edit' => true, 'readOnly' => true, 'required' => true));
+
+    }
     /* ====================================================
         BUSQUEDAS
     =======================================================*/
