@@ -16,96 +16,121 @@ class ResolucionesController extends ControllerBase
 
 
 
+
     /**
-     * Displays the creation form
+     * Muestra un formulario para crear una resolucion
      */
     public function newAction()
     {
+        $this->persistent->parameters = null;
+
+        $this->assets->collection('headerCss')
+            ->addCss('plugins/select2/select2.min.css');
+        $this->assets->collection('footerJs')
+            ->addJs('plugins/select2/select2.full.min.js');
+        $this->assets->collection('footerInlineJs')
+            ->addInlineJs('
+            $(".autocompletar").select2();
+            $(document).ready( function() {
+                var now = new Date();
+                var day = ("0" + now.getDate()).slice(-2);
+                var month = ("0" + (now.getMonth() + 1)).slice(-2);
+                var today = now.getFullYear()+"-"+(month)+"-"+(day) ;
+                $(\'#fecha\').val(today);
+                });
+            ');
+        $this->view->form = new ResolucionesForm(null, array('edit' => true, 'required' => true));
 
     }
 
+    /**
+     * guarda una resoluciones nueva
+     */
+    public function createAction()
+    {
+        if (!$this->request->isPost()) {
+            return $this->redireccionar("resoluciones/listar");
+        }
+        $this->db->begin();
+
+        $form = new ResolucionesForm();
+        $documento = new Resoluciones();
+        // Recuperamos los datos por post y seteanmos la entidad
+        $data = $this->request->getPost();
+        $form->bind($data, $documento);
+        /*Obtenemos el ultimo numero de resoluciones*/
+        $ultimo = Resoluciones::findFirst("ultimo=1");
+        if (!$ultimo) {
+            $documento->setNroResolucion(1);
+            $documento->setUltimo(1);
+        } else {
+            $ultimo->setUltimo(0);
+            if (!$ultimo->update()) {
+                $this->db->rollback();
+                foreach ($ultimo->getMessages() as $message) {
+                    $this->flash->error($message);
+                }
+                return $this->redireccionar('resoluciones/new');
+            }
+            $documento->setNroResolucion($ultimo->getNroResolucion() + 1);
+            $documento->setUltimo(1);
+
+        }
+        /*Validamos el formulario*/
+        if (!$form->isValid()) {
+            $this->db->rollback();
+            foreach ($form->getMessages() as $message) {
+                $this->flash->error($message);
+            }
+            return $this->redireccionar('resoluciones/new');
+        }
+        /*Seteamos los campos faltantes*/
+        $documento->setHabilitado(1);
+        $documento->setDescripcion(mb_strtoupper($documento->getDescripcion()));
+        $documento->setTipo(3);
+        /*Guardamos el adjunto*/
+        $archivos = $this->request->getUploadedFiles();
+        if ($archivos[0]->getName() != "") {
+
+            $nombreCarpeta = 'files/resoluciones/' . date('Ymd') . '/' . $documento->getNroResolucion();
+            $path = $this->guardarAdjunto($archivos, $nombreCarpeta);
+            if ($path == "") {
+                $this->flashSession->error("Edite la resoluciones para volver a adjuntar el archivo.");
+            }
+            else{
+                $documento->setResolucionesAdjunto($path);
+            }
+        }
+        /*Guardamos la instancia en la bd*/
+        if ($documento->save() == false) {
+            $this->db->rollback();
+            foreach ($documento->getMessages() as $message) {
+                $this->flash->error($message);
+            }
+            return $this->redireccionar('resoluciones/new');
+        }
+
+        $form->clear();
+        $this->db->commit();
+        $this->flashSession->success("La Resolucion ha sido creada correctamente");
+        return $this->response->redirect('resoluciones/listar');
+    }
     /**
      * Edits a resolucione
      *
      * @param string $id_documento
      */
-    public function editAction($id_documento)
+    public function editarAction($id_documento)
     {
 
-        if (!$this->request->isPost()) {
-
-            $resolucione = Resoluciones::findFirstByid_documento($id_documento);
-            if (!$resolucione) {
-                $this->flash->error("resolucione was not found");
-
-                return $this->dispatcher->forward(array(
-                    "controller" => "resoluciones",
-                    "action" => "index"
-                ));
-            }
-
-            $this->view->id_documento = $resolucione->id_documento;
-
-            $this->tag->setDefault("id_documento", $resolucione->getIdDocumento());
-            $this->tag->setDefault("nro_resolucion", $resolucione->getNroResolucion());
-            $this->tag->setDefault("creadopor", $resolucione->getCreadopor());
-            $this->tag->setDefault("descripcion", $resolucione->getDescripcion());
-            $this->tag->setDefault("fecha", $resolucione->getFecha());
-            $this->tag->setDefault("habilitado", $resolucione->getHabilitado());
-            $this->tag->setDefault("sector_id_oid", $resolucione->getSectorIdOid());
-            $this->tag->setDefault("tipo", $resolucione->getTipo());
-            $this->tag->setDefault("ultimo", $resolucione->getUltimo());
-            $this->tag->setDefault("resoluciones_adjunto", $resolucione->getResolucionesAdjunto());
-            
+        $documento = Nota::findFirst(array('id_documento=' . $id_documento));
+        if (!$documento) {
+            $this->flash->error("La nota no se encontró");
+            return $this->redireccionar("nota/search");
         }
+        $this->view->resoluciones = $documento;
+        $this->view->form = new ResolucionesForm($documento, array('edit' => true, 'required' => true));
     }
-
-    /**
-     * Creates a new resolucione
-     */
-    public function createAction()
-    {
-
-        if (!$this->request->isPost()) {
-            return $this->dispatcher->forward(array(
-                "controller" => "resoluciones",
-                "action" => "index"
-            ));
-        }
-
-        $resolucione = new Resoluciones();
-
-        $resolucione->setNroResolucion($this->request->getPost("nro_resolucion"));
-        $resolucione->setCreadopor($this->request->getPost("creadopor"));
-        $resolucione->setDescripcion($this->request->getPost("descripcion"));
-        $resolucione->setFecha($this->request->getPost("fecha"));
-        $resolucione->setHabilitado($this->request->getPost("habilitado"));
-        $resolucione->setSectorIdOid($this->request->getPost("sector_id_oid"));
-        $resolucione->setTipo($this->request->getPost("tipo"));
-        $resolucione->setUltimo($this->request->getPost("ultimo"));
-        $resolucione->setResolucionesAdjunto($this->request->getPost("resoluciones_adjunto"));
-        
-
-        if (!$resolucione->save()) {
-            foreach ($resolucione->getMessages() as $message) {
-                $this->flash->error($message);
-            }
-
-            return $this->dispatcher->forward(array(
-                "controller" => "resoluciones",
-                "action" => "new"
-            ));
-        }
-
-        $this->flash->success("resolucione was created successfully");
-
-        return $this->dispatcher->forward(array(
-            "controller" => "resoluciones",
-            "action" => "index"
-        ));
-
-    }
-
     /**
      * Saves a resolucione edited
      *
@@ -114,94 +139,74 @@ class ResolucionesController extends ControllerBase
     {
 
         if (!$this->request->isPost()) {
-            return $this->dispatcher->forward(array(
-                "controller" => "resoluciones",
-                "action" => "index"
-            ));
+            return $this->redireccionar("resoluciones/listar");
         }
+        $this->db->begin();
 
-        $id_documento = $this->request->getPost("id_documento");
+        $form = new ResolucionesForm();
+        $documento = new Resoluciones();
+        // Recuperamos los datos por post y seteanmos la entidad
+        $data = $this->request->getPost();
+        $form->bind($data, $documento);
+        /*Obtenemos el ultimo numero de nota*/
+        $ultimo = Resoluciones::findFirst("ultimo=1");
+        if (!$ultimo) {
+            $documento->setNroResolucion(1);
+            $documento->setUltimo(1);
+        } else {
+            $ultimo->setUltimo(0);
+            if (!$ultimo->update()) {
+                $this->db->rollback();
+                foreach ($ultimo->getMessages() as $message) {
+                    $this->flash->error($message);
+                }
+                return $this->redireccionar('resoluciones/new');
+            }
+            $documento->setNroResolucion($ultimo->getNroResolucion() + 1);
+            $documento->setUltimo(1);
 
-        $resolucione = Resoluciones::findFirstByid_documento($id_documento);
-        if (!$resolucione) {
-            $this->flash->error("resolucione does not exist " . $id_documento);
-
-            return $this->dispatcher->forward(array(
-                "controller" => "resoluciones",
-                "action" => "index"
-            ));
         }
-
-        $resolucione->setNroResolucion($this->request->getPost("nro_resolucion"));
-        $resolucione->setCreadopor($this->request->getPost("creadopor"));
-        $resolucione->setDescripcion($this->request->getPost("descripcion"));
-        $resolucione->setFecha($this->request->getPost("fecha"));
-        $resolucione->setHabilitado($this->request->getPost("habilitado"));
-        $resolucione->setSectorIdOid($this->request->getPost("sector_id_oid"));
-        $resolucione->setTipo($this->request->getPost("tipo"));
-        $resolucione->setUltimo($this->request->getPost("ultimo"));
-        $resolucione->setResolucionesAdjunto($this->request->getPost("resoluciones_adjunto"));
-        
-
-        if (!$resolucione->save()) {
-
-            foreach ($resolucione->getMessages() as $message) {
+        /*Validamos el formulario*/
+        if (!$form->isValid()) {
+            $this->db->rollback();
+            foreach ($form->getMessages() as $message) {
                 $this->flash->error($message);
             }
+            return $this->redireccionar('resoluciones/new');
+        }
+        /*Seteamos los campos faltantes*/
+        $documento->setHabilitado(1);
+        $documento->setDescripcion(mb_strtoupper($documento->getDescripcion()));
+        $documento->setTipo(1);
+        /*Guardamos el adjunto*/
+        $archivos = $this->request->getUploadedFiles();
+        if ($archivos[0]->getName() != "") {
 
-            return $this->dispatcher->forward(array(
-                "controller" => "resoluciones",
-                "action" => "edit",
-                "params" => array($resolucione->id_documento)
-            ));
+            $nombreCarpeta = 'files/resoluciones/' . date('Ymd') . '/' . $documento->getNroResolucion();
+            $path = $this->guardarAdjunto($archivos, $nombreCarpeta);
+            if ($path == "") {
+                $this->flashSession->error("Edite la resolucion para volver a adjuntar el archivo.");
+            }
+            else{
+                $documento->setResolucionesAdjunto($path);
+            }
+        }
+        /*Guardamos la instancia en la bd*/
+        if ($documento->save() == false) {
+            $this->db->rollback();
+            foreach ($documento->getMessages() as $message) {
+                $this->flash->error($message);
+            }
+            return $this->redireccionar('resoluciones/new');
         }
 
-        $this->flash->success("resolucione was updated successfully");
-
-        return $this->dispatcher->forward(array(
-            "controller" => "resoluciones",
-            "action" => "index"
-        ));
+        $form->clear();
+        $this->db->commit();
+        $this->flashSession->success("La Resolucion ha sido creada correctamente");
+        return $this->response->redirect('resoluciones/listar');
 
     }
 
-    /**
-     * Deletes a resolucione
-     *
-     * @param string $id_documento
-     */
-    public function deleteAction($id_documento)
-    {
-
-        $resolucione = Resoluciones::findFirstByid_documento($id_documento);
-        if (!$resolucione) {
-            $this->flash->error("resolucione was not found");
-
-            return $this->dispatcher->forward(array(
-                "controller" => "resoluciones",
-                "action" => "index"
-            ));
-        }
-
-        if (!$resolucione->delete()) {
-
-            foreach ($resolucione->getMessages() as $message) {
-                $this->flash->error($message);
-            }
-
-            return $this->dispatcher->forward(array(
-                "controller" => "resoluciones",
-                "action" => "search"
-            ));
-        }
-
-        $this->flash->success("resolucione was deleted successfully");
-
-        return $this->dispatcher->forward(array(
-            "controller" => "resoluciones",
-            "action" => "index"
-        ));
-    }
     /**
      * Muestra los datos de la resolucion y ofrece las operaciones que se pueden realizar sobre la misma.
      * @param $id_documento
@@ -212,8 +217,8 @@ class ResolucionesController extends ControllerBase
 
         $documento = Resoluciones::findFirst(array('id_documento=' . $id_documento));
         if (!$documento) {
-            $this->flash->error("La nota no se encontró");
-            return $this->redireccionar("nota/listar");
+            $this->flash->error("La resoluciones no se encontró");
+            return $this->redireccionar("resoluciones/listar");
         }
         $this->view->resolucion = $documento;
         $this->view->form = new ResolucionesForm($documento, array('edit' => true, 'readOnly' => true, 'required' => true));
@@ -221,7 +226,7 @@ class ResolucionesController extends ControllerBase
     }
 
     /**
-     * Pregunta si esta seguro de eliminar la nota
+     * Pregunta si esta seguro de eliminar la resoluciones
      * @param $id_documento
      * @return null
      */
@@ -229,11 +234,11 @@ class ResolucionesController extends ControllerBase
     {
         $documento = Resoluciones::findFirst('id_documento=' . $id_documento);
         if (!$documento) {
-            $this->flashSession->error("La nota no se encontró");
+            $this->flashSession->error("La resoluciones no se encontró");
             return $this->response->redirect("resoluciones/listar");
         }
         if ($documento->getHabilitado() == 0) {
-            $this->flashSession->warning("La nota ya fue eliminada");
+            $this->flashSession->warning("La resoluciones ya fue eliminada");
             return $this->response->redirect("resoluciones/listar");
         }
         $this->view->id_documento = $id_documento;
@@ -241,10 +246,10 @@ class ResolucionesController extends ControllerBase
 
 
     /**
-     * Elimina la nota de manera logica
-     * Si es la ultima nota: la nota anterior  debera convertirse en la ultima para que la numeracion continue.
-     * (debe ser del mismo año que la nota a eliminar)
-     * Si no es la ultima nota: se la deshabilita nada mas.
+     * Elimina la resoluciones de manera logica
+     * Si es la ultima resoluciones: la resoluciones anterior  debera convertirse en la ultima para que la numeracion continue.
+     * (debe ser del mismo año que la resoluciones a eliminar)
+     * Si no es la ultima resoluciones: se la deshabilita nada mas.
      * @return null
      */
     public function eliminarLogicoAction()
@@ -255,7 +260,7 @@ class ResolucionesController extends ControllerBase
             $documento = Resoluciones::findFirst('id_documento=' . $id_documento);
             if (!$documento) {
                 $this->flashSession->warning("La Resolucion no se encontró");
-                return $this->response->redirect("nota/listar");
+                return $this->response->redirect("resoluciones/listar");
             }
             $this->db->begin();
             if ($documento->getUltimo() == 1) {
@@ -270,7 +275,7 @@ class ResolucionesController extends ControllerBase
                 while ($band) {
                     $id_anterior = ($id - 1);
                     $anterior = Resoluciones::findFirst('id_documento=' . $id_anterior . " AND fecha BETWEEN '$anio-01-01' AND '$anio-12-31'");
-                    if (!$anterior)//Si no existe anterior, entonces empezaria en 0 la siguiente nota que se ingrese
+                    if (!$anterior)//Si no existe anterior, entonces empezaria en 0 la siguiente resoluciones que se ingrese
                     {
                         $band = false;//Corta el bucle
                     } else {
@@ -309,7 +314,7 @@ class ResolucionesController extends ControllerBase
                     foreach ($documento->getMessages() as $mensaje) {
                         $this->flash->error($mensaje);
                     }
-                    return $this->redireccionar('nota/eliminar/' . $id_documento);
+                    return $this->redireccionar('resoluciones/eliminar/' . $id_documento);
                 }
                 $this->db->commit();
                 $this->flashSession->success('La resolucion ' . $documento->getNroResolucion() . ' ha sido deshabilitada');
@@ -332,7 +337,7 @@ class ResolucionesController extends ControllerBase
 
         $documento = Resoluciones::find($parameters);
         if (count($documento) == 0) {
-            $this->flashSession->warning("<i class='fa fa-warning'></i> No se encontraron notas cargadas en el sistema");
+            $this->flashSession->warning("<i class='fa fa-warning'></i> No se encontraron resoluciones cargadas en el sistema");
             return $this->response->redirect('resoluciones/index');
         }
 
