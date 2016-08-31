@@ -85,7 +85,7 @@ class CaratulaController  extends ControllerBase
 
         // Get the view data
 
-        $html = $this->view->getRender('caratula', 'memo', array(
+        $html = $this->view->getRender('caratula', 'resoluciones', array(
             'nro' => $documento->getNroResolucion(),
             'fecha' =>  date('d/m/Y', strtotime($documento->getFecha())),
             'origen' => $documento->getSector()->getSectorNombre(),
@@ -94,7 +94,7 @@ class CaratulaController  extends ControllerBase
         ));
         $pdf = new mpdf();
         $pdf->WriteHTML($html, 2);
-        $pdf->Output('nota_'.$documento->getNroResolucion().'_'.$documento->getFecha().'.pdf', "I");
+        $pdf->Output('resoluciones_'.$documento->getNroResolucion().'_'.$documento->getFecha().'.pdf', "I");
 
     }
 }
