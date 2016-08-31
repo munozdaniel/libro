@@ -12,6 +12,14 @@ class ResolucionesController extends ControllerBase
     public function indexAction()
     {
         $this->persistent->parameters = null;
+
+        $this->assets->collection('headerCss')
+            ->addCss('plugins/select2/select2.min.css');
+        $this->assets->collection('footerJs')
+            ->addJs('plugins/select2/select2.full.min.js');
+        $this->assets->collection('footerInlineJs')
+            ->addInlineJs(' $(".autocompletar").select2();');
+        $this->view->form = new ResolucionesForm(null, array('edit' => true));
     }
 
 
@@ -123,10 +131,10 @@ class ResolucionesController extends ControllerBase
     public function editarAction($id_documento)
     {
 
-        $documento = Nota::findFirst(array('id_documento=' . $id_documento));
+        $documento = Resoluciones::findFirst(array('id_documento=' . $id_documento));
         if (!$documento) {
-            $this->flash->error("La nota no se encontró");
-            return $this->redireccionar("nota/search");
+            $this->flash->error("La resolucion no se encontró");
+            return $this->redireccionar("resoluciones/search");
         }
         $this->view->resoluciones = $documento;
         $this->view->form = new ResolucionesForm($documento, array('edit' => true, 'required' => true));
@@ -141,68 +149,54 @@ class ResolucionesController extends ControllerBase
         if (!$this->request->isPost()) {
             return $this->redireccionar("resoluciones/listar");
         }
+
+        $id = $this->request->getPost("id_documento", "int");
+
+        $documento = Resoluciones::findFirst("id_documento=" . $id);
+        if (!$documento) {
+            $this->flash->error("La resolucion no pudo ser editada.");
+            return $this->redireccionar("resoluciones/listar");
+        }
         $this->db->begin();
 
-        $form = new ResolucionesForm();
-        $documento = new Resoluciones();
-        // Recuperamos los datos por post y seteanmos la entidad
+        /*Validamos el formulario*/
+        $form = new ResolucionesForm;
+        $this->view->form = $form;
         $data = $this->request->getPost();
         $form->bind($data, $documento);
-        /*Obtenemos el ultimo numero de nota*/
-        $ultimo = Resoluciones::findFirst("ultimo=1");
-        if (!$ultimo) {
-            $documento->setNroResolucion(1);
-            $documento->setUltimo(1);
-        } else {
-            $ultimo->setUltimo(0);
-            if (!$ultimo->update()) {
-                $this->db->rollback();
-                foreach ($ultimo->getMessages() as $message) {
-                    $this->flash->error($message);
-                }
-                return $this->redireccionar('resoluciones/new');
-            }
-            $documento->setNroResolucion($ultimo->getNroResolucion() + 1);
-            $documento->setUltimo(1);
-
-        }
         /*Validamos el formulario*/
         if (!$form->isValid()) {
             $this->db->rollback();
             foreach ($form->getMessages() as $message) {
                 $this->flash->error($message);
             }
-            return $this->redireccionar('resoluciones/new');
+            return $this->redireccionar('resoluciones/editar/' . $id);
         }
-        /*Seteamos los campos faltantes*/
-        $documento->setHabilitado(1);
-        $documento->setDescripcion(mb_strtoupper($documento->getDescripcion()));
-        $documento->setTipo(1);
+
         /*Guardamos el adjunto*/
         $archivos = $this->request->getUploadedFiles();
         if ($archivos[0]->getName() != "") {
-
             $nombreCarpeta = 'files/resoluciones/' . date('Ymd') . '/' . $documento->getNroResolucion();
-            $path = $this->guardarAdjunto($archivos, $nombreCarpeta);
+            $path = $this->guardarAdjunto($this->request->getUploadedFiles(), $nombreCarpeta);
             if ($path == "") {
-                $this->flashSession->error("Edite la resolucion para volver a adjuntar el archivo.");
+                $this->flash->error("Ocurrió un problema al guardar el archivo adjunto. Edite la resolucion para volver a adjuntar el archivo.");
             }
-            else{
-                $documento->setResolucionesAdjunto($path);
-            }
+            $documento->setResolucionesAdjunto($path);
         }
-        /*Guardamos la instancia en la bd*/
+        /*Actualizamos los datos*/
+        $documento->setDescripcion(mb_strtoupper($documento->getDescripcion()));
         if ($documento->save() == false) {
             $this->db->rollback();
             foreach ($documento->getMessages() as $message) {
                 $this->flash->error($message);
             }
-            return $this->redireccionar('resoluciones/new');
+            return $this->redireccionar('resoluciones/editar/' . $id);
         }
 
         $form->clear();
+
         $this->db->commit();
-        $this->flashSession->success("La Resolucion ha sido creada correctamente");
+        $this->flashSession->success("La Resolucion ha sido actualizada correctamente");
         return $this->response->redirect('resoluciones/listar');
 
     }
@@ -320,7 +314,7 @@ class ResolucionesController extends ControllerBase
                 $this->flashSession->success('La resolucion ' . $documento->getNroResolucion() . ' ha sido deshabilitada');
             }
         }
-        return $this->response->redirect("resolucion/listar");
+        return $this->response->redirect("resoluciones/listar");
     }
 
     /* ====================================================
@@ -411,7 +405,7 @@ class ResolucionesController extends ControllerBase
         $this->setDatatables();
         $numberPage = 1;
         if ($this->request->isPost()) {
-            $query = Criteria::fromInput($this->di, "Nota", $_POST);
+            $query = Criteria::fromInput($this->di, "Resoluciones", $_POST);
             $this->persistent->parameters = $query->getParams();
         } else {
             $numberPage = $this->request->getQuery("page", "int");
@@ -437,7 +431,7 @@ class ResolucionesController extends ControllerBase
 
         $parameters["order"] = "id_documento DESC";
 
-        $resoluciones = Nota::find($parameters);
+        $resoluciones = Resoluciones::find($parameters);
         if (count($resoluciones) == 0) {
             $this->flashSession->warning("<i class='fa fa-warning'></i> No se encontraron resoluciones cargadas en el sistema que coincidan con su búsqueda");
             return $this->response->redirect('resoluciones/index');
@@ -469,7 +463,7 @@ class ResolucionesController extends ControllerBase
         $hasta = $this->request->getPost('fecha_hasta');
         if ($this->request->isPost()) {
 
-            $query = Criteria::fromInput($this->di, "Nota", $_POST);
+            $query = Criteria::fromInput($this->di, "Resoluciones", $_POST);
             $this->persistent->parameters = $query->getParams();
         } else {
             $numberPage = $this->request->getQuery("page", "int");
@@ -486,7 +480,7 @@ class ResolucionesController extends ControllerBase
             else
                 $parameters['conditions'] = "$limitarAnio  fecha BETWEEN '$desde' AND '$hasta'";
         }
-        $resoluciones = Nota::find($parameters);
+        $resoluciones = Resoluciones::find($parameters);
         if (count($resoluciones) == 0) {
             $this->flashSession->warning("<i class='fa fa-warning'></i> No se encontraron resoluciones cargadas en el sistema que coincidan con su búsqueda");
             return $this->response->redirect('resoluciones/index');
@@ -519,7 +513,7 @@ class ResolucionesController extends ControllerBase
         $hasta = $this->request->getPost('nroFinal');
         if ($this->request->isPost()) {
 
-            $query = Criteria::fromInput($this->di, "Nota", $_POST);
+            $query = Criteria::fromInput($this->di, "Resoluciones", $_POST);
             $this->persistent->parameters = $query->getParams();
         } else {
             $numberPage = $this->request->getQuery("page", "int");
@@ -537,7 +531,7 @@ class ResolucionesController extends ControllerBase
             else
                 $parameters['conditions'] = "$limitarAnio  nro_resolucion >= $desde AND nro_resolucion <= $hasta";
         }
-        $resoluciones = Nota::find($parameters);
+        $resoluciones = Resoluciones::find($parameters);
         if (count($resoluciones) == 0) {
             $this->flashSession->warning("<i class='fa fa-warning'></i> No se encontraron resoluciones cargadas en el sistema que coincidan con su búsqueda");
             return $this->response->redirect('resoluciones/index');

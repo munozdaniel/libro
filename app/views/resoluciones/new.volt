@@ -36,7 +36,7 @@
                 </div>
                 <div class="form-group">
                     <button type="submit" form="nuevo" class="btn btn-flat btn-block btn-social btn-twitter">
-                        <i class="fa fa-check"></i> Guardar Nota
+                        <i class="fa fa-check"></i> Guardar Resolucion
                     </button>
                 </div>
 

@@ -15,7 +15,7 @@
     {% endfor %}
     <div class="form-group">
         <label for="nota_adjunto">Adjunto</label>
-        {{ text_field('resoluciones_adjunto_prev','value':resoluciones.getNotaAdjunto(),'class':'form-control','readOnly':'','placeholder':'SIN ADJUNTO') }}
+        {{ text_field('resoluciones_adjunto_prev','value':resoluciones.getResolucionesAdjunto(),'class':'form-control','readOnly':'','placeholder':'SIN ADJUNTO') }}
     </div>
     <div class="form-group text-red">
         <label for="resoluciones_adjunto">Reemplazar Adjunto</label>

@@ -49,14 +49,14 @@
             <form class="form-horizontal">
                 <div class="box-body">
                     <div class="form-group">
-                        {{ link_to('caratula/resolucion/'~resolucion.getIdDocumento(),'<i class="fa fa-file"></i> Generar Caratula','class':'btn btn-flat btn-block btn-social btn-tumblr', 'target':'_blank') }}
+                        {{ link_to('caratula/resoluciones/'~resolucion.getIdDocumento(),'<i class="fa fa-file"></i> Generar Caratula','class':'btn btn-flat btn-block btn-social btn-tumblr', 'target':'_blank') }}
                     </div>
                     {% if resolucion.getHabilitado()==1 %}
                         <div class="form-group">
-                            {{ link_to('resolucion/editar/'~resolucion.getIdDocumento(),'<i class="fa fa-pencil"></i> Editar resolucion','class':'btn btn-flat btn-block btn-social btn-twitter') }}
+                            {{ link_to('resoluciones/editar/'~resolucion.getIdDocumento(),'<i class="fa fa-pencil"></i> Editar resolucion','class':'btn btn-flat btn-block btn-social btn-twitter') }}
                         </div>
                         <div class="form-group">
-                            {{ link_to('resolucion/eliminar/'~resolucion.getIdDocumento(),'<i class="fa fa-remove"></i> Eliminar resolucion','class':'btn btn-block btn-flat btn-social btn-google') }}
+                            {{ link_to('resoluciones/eliminar/'~resolucion.getIdDocumento(),'<i class="fa fa-remove"></i> Eliminar resolucion','class':'btn btn-block btn-flat btn-social btn-google') }}
                         </div>
                     {% else %}
                         <div class="form-group">
