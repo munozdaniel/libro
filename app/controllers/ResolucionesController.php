@@ -219,6 +219,105 @@ class ResolucionesController extends ControllerBase
         $this->view->form = new ResolucionesForm($documento, array('edit' => true, 'readOnly' => true, 'required' => true));
 
     }
+
+    /**
+     * Pregunta si esta seguro de eliminar la nota
+     * @param $id_documento
+     * @return null
+     */
+    public function eliminarAction($id_documento)
+    {
+        $documento = Resoluciones::findFirst('id_documento=' . $id_documento);
+        if (!$documento) {
+            $this->flashSession->error("La nota no se encontró");
+            return $this->response->redirect("resoluciones/listar");
+        }
+        if ($documento->getHabilitado() == 0) {
+            $this->flashSession->warning("La nota ya fue eliminada");
+            return $this->response->redirect("resoluciones/listar");
+        }
+        $this->view->id_documento = $id_documento;
+    }
+
+
+    /**
+     * Elimina la nota de manera logica
+     * Si es la ultima nota: la nota anterior  debera convertirse en la ultima para que la numeracion continue.
+     * (debe ser del mismo año que la nota a eliminar)
+     * Si no es la ultima nota: se la deshabilita nada mas.
+     * @return null
+     */
+    public function eliminarLogicoAction()
+    {
+        if ($this->request->isPost()) {
+            $id_documento = $this->request->getPost('id_documento', 'int');
+
+            $documento = Resoluciones::findFirst('id_documento=' . $id_documento);
+            if (!$documento) {
+                $this->flashSession->warning("La Resolucion no se encontró");
+                return $this->response->redirect("nota/listar");
+            }
+            $this->db->begin();
+            if ($documento->getUltimo() == 1) {
+
+                /*Si es el ultimo, al anteultimo se lo deja ultimo, para que el
+                 siguiente que se agregue continue con la numeracion*/
+                //Buscamos el anterior habilitado
+                $band = true;
+                $date = DateTime::createFromFormat("Y-m-d", $documento->getFecha());
+                $anio = $date->format("Y");
+                $id = $id_documento;
+                while ($band) {
+                    $id_anterior = ($id - 1);
+                    $anterior = Resoluciones::findFirst('id_documento=' . $id_anterior . " AND fecha BETWEEN '$anio-01-01' AND '$anio-12-31'");
+                    if (!$anterior)//Si no existe anterior, entonces empezaria en 0 la siguiente nota que se ingrese
+                    {
+                        $band = false;//Corta el bucle
+                    } else {
+                        if ($anterior->getHabilitado() == 1) {
+                            $band = false;
+                            $anterior->setUltimo(1);
+                            if (!$anterior->update()) {
+                                $this->db->rollback();
+                                foreach ($anterior->getMessages() as $mensaje) {
+                                    $this->flash->error($mensaje);
+                                }
+                                return $this->redireccionar('resoluciones/eliminar/' . $id_documento);
+                            }
+                        }
+                    }
+                    $id = ($id - 1);
+                }
+                $documento->setUltimo(0);
+                $documento->setHabilitado(0);
+                if (!$documento->update()) {
+                    $this->db->rollback();
+                    foreach ($documento->getMessages() as $mensaje) {
+                        $this->flash->error($mensaje);
+                    }
+                    return $this->redireccionar('resoluciones/eliminar/' . $id_documento);
+                }
+                $this->db->commit();
+                $this->flash->success('La resolucion ' . $documento->getNroResolucion() . ' ha sido deshabilitada');
+
+            } else {
+                /*Si no es el ultimo, se deshabilita*/
+                $documento->setUltimo(0);
+                $documento->setHabilitado(0);
+                if (!$documento->update()) {
+                    $this->db->rollback();
+                    foreach ($documento->getMessages() as $mensaje) {
+                        $this->flash->error($mensaje);
+                    }
+                    return $this->redireccionar('nota/eliminar/' . $id_documento);
+                }
+                $this->db->commit();
+                $this->flashSession->success('La resolucion ' . $documento->getNroResolucion() . ' ha sido deshabilitada');
+            }
+        }
+        return $this->response->redirect("resolucion/listar");
+    }
+
     /* ====================================================
         BUSQUEDAS
     =======================================================*/
