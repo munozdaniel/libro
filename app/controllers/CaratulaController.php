@@ -69,4 +69,32 @@ class CaratulaController  extends ControllerBase
         $pdf->Output('nota_'.$memo->getNroMemo().'_'.$memo->getFecha().'.pdf', "I");
 
     }
+    public function resolucionesAction($id_documento)
+    {
+        $this->view->disable();
+        $documento = Resoluciones::findFirst('id_documento=' . $id_documento);
+        if (!$documento) {
+            $this->flash->error("La Resolucion no se encontró");
+            return $this->redireccionar("resoluciones/listar");
+        }
+        $this->tag->setTitle('');//Para que no muestre el titulo en el pdf.
+
+        ini_set('max_execution_time', 300); //300 seconds = 5 minutes // si funciona pero la pagina anterior se corrompe
+
+
+
+        // Get the view data
+
+        $html = $this->view->getRender('caratula', 'memo', array(
+            'nro' => $documento->getNroResolucion(),
+            'fecha' =>  date('d/m/Y', strtotime($documento->getFecha())),
+            'origen' => $documento->getSector()->getSectorNombre(),
+            'descripcion' => $documento->getDescripcion()
+
+        ));
+        $pdf = new mpdf();
+        $pdf->WriteHTML($html, 2);
+        $pdf->Output('nota_'.$documento->getNroResolucion().'_'.$documento->getFecha().'.pdf', "I");
+
+    }
 }
