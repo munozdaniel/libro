@@ -40,7 +40,7 @@
                             <!-- Menu Footer-->
                             <li class="user-footer">
                                 <div class="pull-right">
-                                    <a href="#" class="btn btn-default btn-flat">Salir</a>
+                                    {{ link_to('sesion/cerrar','SALIR','class':'btn btn-default btn-flat') }}
                                 </div>
                             </li>
                         </ul>
