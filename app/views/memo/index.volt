@@ -20,7 +20,7 @@
                         <label for="nro_memo" class="col-sm-2 control-label">Nro Memo</label>
 
                         <div class="col-sm-4">
-                            {{ text_field('nro_memo','class': 'form-control','placeholder':'Ingrese el Nro de Nota') }}
+                            {{ text_field('nro_memo','class': 'form-control','placeholder':'Ingrese el Nro de Memo') }}
                         </div>
                     </div>
 
