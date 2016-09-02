@@ -49,7 +49,71 @@ class ExpedienteController extends ControllerBase
         $this->view->form = new ExpedienteForm($documento, array('edit' => true, 'required' => true));
     }
 
+    /**
+     * Saves a expediente edited
+     *
+     */
+    public function saveAction()
+    {
 
+        if (!$this->request->isPost()) {
+            return $this->redireccionar("expediente/listar");
+        }
+
+        $id = $this->request->getPost("id_documento", "int");
+
+        $documento = Expediente::findFirst("id_documento=" . $id);
+        if (!$documento) {
+            $this->flash->error("El expediente no pudo ser editada.");
+            return $this->redireccionar("expediente/listar");
+        }
+        $this->db->begin();
+
+        /*Validamos el formulario*/
+        $form = new ExpedienteForm;
+        $this->view->form = $form;
+        $data = $this->request->getPost();
+        $form->bind($data, $documento);
+        /*Validamos el formulario*/
+        if (!$form->isValid()) {
+            $this->db->rollback();
+            foreach ($form->getMessages() as $message) {
+                $this->flash->error($message);
+            }
+            return $this->redireccionar('expediente/editar/' . $id);
+        }
+
+        /*Guardamos el adjunto*/
+        $archivos = $this->request->getUploadedFiles();
+        if ($archivos[0]->getName() != "") {
+            $nombreCarpeta = 'files/expediente/' . date('Ymd') . '/' . $documento->getNroExpediente();
+            $path = $this->guardarAdjunto($this->request->getUploadedFiles(), $nombreCarpeta);
+            if ($path == "") {
+                $this->flash->error("Ocurrió un problema al guardar el archivo adjunto. Edite el expediente para volver a adjuntar el archivo.");
+            }
+            $documento->setExpedienteAdjunto($path);
+        }
+        /*Actualizamos los datos*/
+        //$documento->setExpteCodAnio(date('Y'));
+        //$documento->setExpteCodEmpresa("IMPS");
+        $documento->setExpteCodLetra(mb_strtoupper($documento->getExpteCodLetra()));
+        $documento->setDescripcion(mb_strtoupper($documento->getDescripcion()));
+        //$documento->setExpteCodNumero($documento->getNroExpediente());
+        if ($documento->save() == false) {
+            $this->db->rollback();
+            foreach ($documento->getMessages() as $message) {
+                $this->flash->error($message);
+            }
+            return $this->redireccionar('expediente/editar/' . $id);
+        }
+
+        $form->clear();
+
+        $this->db->commit();
+        $this->flashSession->success("El Expediente ha sido actualizada correctamente");
+        return $this->response->redirect('expediente/listar');
+
+    }
     /**
      * Creates a new expediente
      */
@@ -101,69 +165,7 @@ class ExpedienteController extends ControllerBase
 
     }
 
-    /**
-     * Saves a expediente edited
-     *
-     */
-    public function saveAction()
-    {
 
-        if (!$this->request->isPost()) {
-            return $this->dispatcher->forward(array(
-                "controller" => "expediente",
-                "action" => "index"
-            ));
-        }
-
-        $id_documento = $this->request->getPost("id_documento");
-
-        $expediente = Expediente::findFirstByid_documento($id_documento);
-        if (!$expediente) {
-            $this->flash->error("expediente does not exist " . $id_documento);
-
-            return $this->dispatcher->forward(array(
-                "controller" => "expediente",
-                "action" => "index"
-            ));
-        }
-
-        $expediente->setExpteCodAnio($this->request->getPost("expte_cod_anio"));
-        $expediente->setExpteCodEmpresa($this->request->getPost("expte_cod_empresa"));
-        $expediente->setExpteCodLetra($this->request->getPost("expte_cod_letra"));
-        $expediente->setExpteCodNumero($this->request->getPost("expte_cod_numero"));
-        $expediente->setNroExpediente($this->request->getPost("nro_expediente"));
-        $expediente->setCreadopor($this->request->getPost("creadopor"));
-        $expediente->setDescripcion($this->request->getPost("descripcion"));
-        $expediente->setFecha($this->request->getPost("fecha"));
-        $expediente->setHabilitado($this->request->getPost("habilitado"));
-        $expediente->setSectorIdOid($this->request->getPost("sector_id_oid"));
-        $expediente->setTipo($this->request->getPost("tipo"));
-        $expediente->setUltimo($this->request->getPost("ultimo"));
-        $expediente->setExpedienteUltimamodificacion($this->request->getPost("expediente_ultimaModificacion"));
-        $expediente->setExpedienteAdjunto($this->request->getPost("expediente_adjunto"));
-        
-
-        if (!$expediente->save()) {
-
-            foreach ($expediente->getMessages() as $message) {
-                $this->flash->error($message);
-            }
-
-            return $this->dispatcher->forward(array(
-                "controller" => "expediente",
-                "action" => "edit",
-                "params" => array($expediente->id_documento)
-            ));
-        }
-
-        $this->flash->success("expediente was updated successfully");
-
-        return $this->dispatcher->forward(array(
-            "controller" => "expediente",
-            "action" => "index"
-        ));
-
-    }
 
     /**
      * Deletes a expediente
@@ -175,7 +177,7 @@ class ExpedienteController extends ControllerBase
 
         $expediente = Expediente::findFirstByid_documento($id_documento);
         if (!$expediente) {
-            $this->flash->error("expediente was not found");
+            $this->flash->error("El expediente no se encontró");
 
             return $this->dispatcher->forward(array(
                 "controller" => "expediente",
@@ -213,7 +215,7 @@ class ExpedienteController extends ControllerBase
 
         $documento = Expediente::findFirst(array('id_documento=' . $id_documento));
         if (!$documento) {
-            $this->flash->error("La expediente no se encontró");
+            $this->flash->error("El expediente no se encontró");
             return $this->redireccionar("expediente/listar");
         }
         $this->view->expediente = $documento;

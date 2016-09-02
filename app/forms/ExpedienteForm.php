@@ -115,7 +115,7 @@ class ExpedienteForm extends Form
         $elemento = new Text('expte_cod_letra',
             array(
                 'class' => 'form-control only-text',
-                'placeholder' => 'Letra',
+                'placeholder' => 'Ingrese una Letra',
                 'maxlength' => 1,
                 $opcion['required'] => '',
                 $opcion['readOnly'] => ''
