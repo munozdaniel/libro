@@ -19,10 +19,10 @@
                 <td>{{ rol.getRolNombre() }}</td>
                 <td>{{ rol.getRolDescripcion() }}</td>
                 <td>
-                    {{ link_to('rol/verUsuariosPorRol/'~rol.getRolId(),'<i class="fa fa-user"></i> ','class':'btn btn-primary btn-flat','style':'border-width: 4px;') }}
+                    {{ link_to('usuarios/verUsuariosPorRol/'~rol.getRolId(),'<i class="fa fa-user"></i> ','class':'btn btn-primary btn-flat','style':'border-width: 4px;') }}
                 </td>
                 <td>
-                    {{ link_to('rol/verPermisosPorRol/'~rol.getRolId(),'<i class="fa fa-key"></i> ','class':'btn btn-primary btn-flat','style':'border-width: 4px;') }}
+                    {{ link_to('pagina/verPermisosPorRol/'~rol.getRolId(),'<i class="fa fa-key"></i> ','class':'btn btn-primary btn-flat','style':'border-width: 4px;') }}
                 </td>
             </tr>
         {% endfor %}
