@@ -437,7 +437,13 @@ class Expediente extends \Phalcon\Mvc\Model
     {
         return $this->expediente_adjunto;
     }
-
+    /**
+     * Initialize method for model.
+     */
+    public function initialize()
+    {
+        $this->belongsTo('sector_id_oid', 'Sectores', 'sector_id', array('alias' => 'Sectores'));
+    }
     /**
      * Returns table name mapped in the model.
      *
