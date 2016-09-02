@@ -117,7 +117,8 @@ class ExpedienteForm extends Form
                 'class' => 'form-control only-text',
                 'placeholder' => 'Letra',
                 'maxlength' => 1,
-                $opcion['required'] => ''
+                $opcion['required'] => '',
+                $opcion['readOnly'] => ''
             ));
         $elemento->setLabel($opcion['asterisco'] . ' Código');
         $elemento->setFilters(array('striptags', 'string'));

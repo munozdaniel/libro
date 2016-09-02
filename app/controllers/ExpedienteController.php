@@ -217,6 +217,25 @@ class ExpedienteController extends ControllerBase
             "action" => "index"
         ));
     }
+
+    /**
+     * Muestra los datos del expediente y ofrece las operaciones que se pueden realizar sobre la misma.
+     * @param $id_documento
+     * @return null
+     */
+    public function verAction($id_documento)
+    {
+
+        $documento = Expediente::findFirst(array('id_documento=' . $id_documento));
+        if (!$documento) {
+            $this->flash->error("La expediente no se encontró");
+            return $this->redireccionar("expediente/listar");
+        }
+        $this->view->expediente = $documento;
+        $this->view->form = new ExpedienteForm($documento, array('edit' => true, 'readOnly' => true, 'required' => true));
+
+    }
+
     /* ====================================================
            BUSQUEDAS
        =======================================================*/
