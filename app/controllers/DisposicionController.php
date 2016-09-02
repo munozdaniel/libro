@@ -47,7 +47,67 @@ class DisposicionController extends ControllerBase
         $this->view->disposicion = $documento;
         $this->view->form = new DisposicionForm($documento, array('edit' => true, 'required' => true));
     }
+    /**
+     * Saves a disposicione edited
+     *
+     */
+    public function saveAction()
+    {
 
+        if (!$this->request->isPost()) {
+            return $this->redireccionar("disposicion/listar");
+        }
+
+        $id = $this->request->getPost("id_documento", "int");
+
+        $documento = Disposicion::findFirst("id_documento=" . $id);
+        if (!$documento) {
+            $this->flash->error("La disposicion no pudo ser editada.");
+            return $this->redireccionar("disposicion/listar");
+        }
+        $this->db->begin();
+
+        /*Validamos el formulario*/
+        $form = new DisposicionForm;
+        $this->view->form = $form;
+        $data = $this->request->getPost();
+        $form->bind($data, $documento);
+        /*Validamos el formulario*/
+        if (!$form->isValid()) {
+            $this->db->rollback();
+            foreach ($form->getMessages() as $message) {
+                $this->flash->error($message);
+            }
+            return $this->redireccionar('disposicion/editar/' . $id);
+        }
+
+        /*Guardamos el adjunto*/
+        $archivos = $this->request->getUploadedFiles();
+        if ($archivos[0]->getName() != "") {
+            $nombreCarpeta = 'files/disposicion/' . date('Ymd') . '/' . $documento->getNroDisposicion();
+            $path = $this->guardarAdjunto($this->request->getUploadedFiles(), $nombreCarpeta);
+            if ($path == "") {
+                $this->flash->error("Ocurrió un problema al guardar el archivo adjunto. Edite la disposicion para volver a adjuntar el archivo.");
+            }
+            $documento->setDisposicionAdjunto($path);
+        }
+        /*Actualizamos los datos*/
+        $documento->setDescripcion(mb_strtoupper($documento->getDescripcion()));
+        if ($documento->save() == false) {
+            $this->db->rollback();
+            foreach ($documento->getMessages() as $message) {
+                $this->flash->error($message);
+            }
+            return $this->redireccionar('disposicion/editar/' . $id);
+        }
+
+        $form->clear();
+
+        $this->db->commit();
+        $this->flashSession->success("La Disposicion ha sido actualizada correctamente");
+        return $this->response->redirect('disposicion/listar');
+
+    }
     /**
      * Creates a new disposicion
      */
@@ -94,64 +154,7 @@ class DisposicionController extends ControllerBase
 
     }
 
-    /**
-     * Saves a disposicion edited
-     *
-     */
-    public function saveAction()
-    {
 
-        if (!$this->request->isPost()) {
-            return $this->dispatcher->forward(array(
-                "controller" => "disposicion",
-                "action" => "index"
-            ));
-        }
-
-        $id_documento = $this->request->getPost("id_documento");
-
-        $disposicion = Disposicion::findFirstByid_documento($id_documento);
-        if (!$disposicion) {
-            $this->flash->error("disposicion does not exist " . $id_documento);
-
-            return $this->dispatcher->forward(array(
-                "controller" => "disposicion",
-                "action" => "index"
-            ));
-        }
-
-        $disposicion->setNroDisposicion($this->request->getPost("nro_disposicion"));
-        $disposicion->setCreadopor($this->request->getPost("creadopor"));
-        $disposicion->setDescripcion($this->request->getPost("descripcion"));
-        $disposicion->setFecha($this->request->getPost("fecha"));
-        $disposicion->setHabilitado($this->request->getPost("habilitado"));
-        $disposicion->setSectorIdOid($this->request->getPost("sector_id_oid"));
-        $disposicion->setTipo($this->request->getPost("tipo"));
-        $disposicion->setUltimo($this->request->getPost("ultimo"));
-        $disposicion->setDisposicionAdjunto($this->request->getPost("disposicion_adjunto"));
-        
-
-        if (!$disposicion->save()) {
-
-            foreach ($disposicion->getMessages() as $message) {
-                $this->flash->error($message);
-            }
-
-            return $this->dispatcher->forward(array(
-                "controller" => "disposicion",
-                "action" => "edit",
-                "params" => array($disposicion->id_documento)
-            ));
-        }
-
-        $this->flash->success("disposicion was updated successfully");
-
-        return $this->dispatcher->forward(array(
-            "controller" => "disposicion",
-            "action" => "index"
-        ));
-
-    }
 
     /**
      * Deletes a disposicion
