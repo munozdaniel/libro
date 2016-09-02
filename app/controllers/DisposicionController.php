@@ -24,39 +24,28 @@ class DisposicionController extends ControllerBase
     }
 
     /**
-     * Edits a disposicion
+     * Edits a expediente
      *
      * @param string $id_documento
      */
-    public function editAction($id_documento)
+    public function editarAction($id_documento)
     {
+        $this->assets->collection('headerCss')
+            ->addCss('plugins/select2/select2.min.css');
+        $this->assets->collection('footerJs')
+            ->addJs('plugins/select2/select2.full.min.js');
+        $this->assets->collection('footerInlineJs')
+            ->addInlineJs('
+            $(".autocompletar").select2();
 
-        if (!$this->request->isPost()) {
-
-            $disposicion = Disposicion::findFirstByid_documento($id_documento);
-            if (!$disposicion) {
-                $this->flash->error("disposicion was not found");
-
-                return $this->dispatcher->forward(array(
-                    "controller" => "disposicion",
-                    "action" => "index"
-                ));
-            }
-
-            $this->view->id_documento = $disposicion->id_documento;
-
-            $this->tag->setDefault("id_documento", $disposicion->getIdDocumento());
-            $this->tag->setDefault("nro_disposicion", $disposicion->getNroDisposicion());
-            $this->tag->setDefault("creadopor", $disposicion->getCreadopor());
-            $this->tag->setDefault("descripcion", $disposicion->getDescripcion());
-            $this->tag->setDefault("fecha", $disposicion->getFecha());
-            $this->tag->setDefault("habilitado", $disposicion->getHabilitado());
-            $this->tag->setDefault("sector_id_oid", $disposicion->getSectorIdOid());
-            $this->tag->setDefault("tipo", $disposicion->getTipo());
-            $this->tag->setDefault("ultimo", $disposicion->getUltimo());
-            $this->tag->setDefault("disposicion_adjunto", $disposicion->getDisposicionAdjunto());
-            
+            ');
+        $documento = Disposicion::findFirst(array('id_documento=' . $id_documento));
+        if (!$documento) {
+            $this->flash->error("La disposicion no se encontró");
+            return $this->redireccionar("disposicion/search");
         }
+        $this->view->disposicion = $documento;
+        $this->view->form = new DisposicionForm($documento, array('edit' => true, 'required' => true));
     }
 
     /**

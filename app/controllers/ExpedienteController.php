@@ -29,41 +29,26 @@ class ExpedienteController extends ControllerBase
      *
      * @param string $id_documento
      */
-    public function editAction($id_documento)
+    public function editarAction($id_documento)
     {
+        $this->assets->collection('headerCss')
+            ->addCss('plugins/select2/select2.min.css');
+        $this->assets->collection('footerJs')
+            ->addJs('plugins/select2/select2.full.min.js');
+        $this->assets->collection('footerInlineJs')
+            ->addInlineJs('
+            $(".autocompletar").select2();
 
-        if (!$this->request->isPost()) {
-
-            $expediente = Expediente::findFirstByid_documento($id_documento);
-            if (!$expediente) {
-                $this->flash->error("expediente was not found");
-
-                return $this->dispatcher->forward(array(
-                    "controller" => "expediente",
-                    "action" => "index"
-                ));
-            }
-
-            $this->view->id_documento = $expediente->id_documento;
-
-            $this->tag->setDefault("id_documento", $expediente->getIdDocumento());
-            $this->tag->setDefault("expte_cod_anio", $expediente->getExpteCodAnio());
-            $this->tag->setDefault("expte_cod_empresa", $expediente->getExpteCodEmpresa());
-            $this->tag->setDefault("expte_cod_letra", $expediente->getExpteCodLetra());
-            $this->tag->setDefault("expte_cod_numero", $expediente->getExpteCodNumero());
-            $this->tag->setDefault("nro_expediente", $expediente->getNroExpediente());
-            $this->tag->setDefault("creadopor", $expediente->getCreadopor());
-            $this->tag->setDefault("descripcion", $expediente->getDescripcion());
-            $this->tag->setDefault("fecha", $expediente->getFecha());
-            $this->tag->setDefault("habilitado", $expediente->getHabilitado());
-            $this->tag->setDefault("sector_id_oid", $expediente->getSectorIdOid());
-            $this->tag->setDefault("tipo", $expediente->getTipo());
-            $this->tag->setDefault("ultimo", $expediente->getUltimo());
-            $this->tag->setDefault("expediente_ultimaModificacion", $expediente->getExpedienteUltimamodificacion());
-            $this->tag->setDefault("expediente_adjunto", $expediente->getExpedienteAdjunto());
-            
+            ');
+        $documento = Expediente::findFirst(array('id_documento=' . $id_documento));
+        if (!$documento) {
+            $this->flash->error("El expediente no se encontró");
+            return $this->redireccionar("expediente/search");
         }
+        $this->view->expediente = $documento;
+        $this->view->form = new ExpedienteForm($documento, array('edit' => true, 'required' => true));
     }
+
 
     /**
      * Creates a new expediente
