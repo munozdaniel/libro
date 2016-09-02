@@ -130,7 +130,15 @@ class ResolucionesController extends ControllerBase
      */
     public function editarAction($id_documento)
     {
+        $this->assets->collection('headerCss')
+            ->addCss('plugins/select2/select2.min.css');
+        $this->assets->collection('footerJs')
+            ->addJs('plugins/select2/select2.full.min.js');
+        $this->assets->collection('footerInlineJs')
+            ->addInlineJs('
+            $(".autocompletar").select2();
 
+            ');
         $documento = Resoluciones::findFirst(array('id_documento=' . $id_documento));
         if (!$documento) {
             $this->flash->error("La resolucion no se encontró");
