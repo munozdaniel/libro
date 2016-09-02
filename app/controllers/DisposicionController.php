@@ -201,6 +201,25 @@ class DisposicionController extends ControllerBase
             "action" => "index"
         ));
     }
+    /**
+     * Muestra los datos de la disposicion y ofrece las operaciones que se pueden realizar sobre la misma.
+     * @param $id_documento
+     * @return null
+     */
+    public function verAction($id_documento)
+    {
+
+        $documento = Disposicion::findFirst(array('id_documento=' . $id_documento));
+        if (!$documento) {
+            $this->flash->error("La disposicion no se encontró");
+            return $this->redireccionar("disposicion/listar");
+        }
+        $this->view->disposicion = $documento;
+        $this->view->form = new DisposicionForm($documento, array('edit' => true, 'readOnly' => true, 'required' => true));
+
+    }
+
+
     /* ====================================================
            BUSQUEDAS
        =======================================================*/
