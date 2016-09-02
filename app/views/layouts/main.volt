@@ -171,10 +171,9 @@
 
                     <div class="form-group">
                         <label class="control-sidebar-subheading">
-                            Ver Roles
-                            {{ link_to('','<i class="fa fa-arrow-right"></i>','class':'pull-right') }}
+                            {{ link_to('rol/verTodosLosRoles',' Ver Roles','class':'') }}
+                            <i class="fa fa-arrow-right pull-right"></i>
                         </label>
-
                         <p>
                             Listado de todos los roles.
                         </p>
