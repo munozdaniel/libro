@@ -97,4 +97,61 @@ class CaratulaController  extends ControllerBase
         $pdf->Output('resoluciones_'.$documento->getNroResolucion().'_'.$documento->getFecha().'.pdf', "I");
 
     }
+
+    public function disposicionAction($id_documento)
+    {
+        $this->view->disable();
+        $documento = Disposicion::findFirst('id_documento=' . $id_documento);
+        if (!$documento) {
+            $this->flash->error("La Disposicion no se encontró");
+            return $this->redireccionar("disposicion/listar");
+        }
+        $this->tag->setTitle('');//Para que no muestre el titulo en el pdf.
+
+        ini_set('max_execution_time', 300); //300 seconds = 5 minutes // si funciona pero la pagina anterior se corrompe
+
+
+
+        // Get the view data
+
+        $html = $this->view->getRender('caratula', 'disposicion', array(
+            'nro' => $documento->getNroDisposicion(),
+            'fecha' =>  date('d/m/Y', strtotime($documento->getFecha())),
+            'origen' => $documento->getSectores()->getSectorNombre(),
+            'descripcion' => $documento->getDescripcion()
+
+        ));
+        $pdf = new mpdf();
+        $pdf->WriteHTML($html, 2);
+        $pdf->Output('disposicion'.$documento->getNroDisposicion().'_'.$documento->getFecha().'.pdf', "I");
+
+    }
+    public function expedienteAction($id_documento)
+    {
+        $this->view->disable();
+        $documento = Expediente::findFirst('id_documento=' . $id_documento);
+        if (!$documento) {
+            $this->flash->error("El Expediente no se encontró");
+            return $this->redireccionar("expediente/listar");
+        }
+        $this->tag->setTitle('');//Para que no muestre el titulo en el pdf.
+
+        ini_set('max_execution_time', 300); //300 seconds = 5 minutes // si funciona pero la pagina anterior se corrompe
+
+
+
+        // Get the view data
+
+        $html = $this->view->getRender('caratula', 'expediente', array(
+            'nro' => $documento->getNroExpediente(),
+            'fecha' =>  date('d/m/Y', strtotime($documento->getFecha())),
+            'origen' => $documento->getSectores()->getSectorNombre(),
+            'descripcion' => $documento->getDescripcion()
+
+        ));
+        $pdf = new mpdf();
+        $pdf->WriteHTML($html, 2);
+        $pdf->Output('expediente'.$documento->getNroExpediente().'_'.$documento->getFecha().'.pdf', "I");
+
+    }
 }
