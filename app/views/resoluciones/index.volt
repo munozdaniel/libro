@@ -5,7 +5,7 @@
                 <li class="active"><a href="#busquedaGeneral" data-toggle="tab">Búsqueda General</a></li>
                 <li><a href="#porSectorYFecha" data-toggle="tab">Por Sector y Fechas </a></li>
                 <li><a href="#EntreFechas" data-toggle="tab">Entre Fechas</a></li>
-                <li><a href="#EntreNumeros" data-toggle="tab">Entre Números de Notas</a></li>
+                <li><a href="#EntreNumeros" data-toggle="tab">Entre Números de Resoluciones</a></li>
             </ul>
             <div class="tab-content">
                 <div class="active tab-pane" id="busquedaGeneral">
@@ -15,7 +15,7 @@
 
                     <div class="alert alert-info"><i class="fa fa-info-circle"></i> Ingrese únicamente los campos necesario. No son obligatorios</div>
                     <div class="form-group">
-                        <label for="nro_resolucion" class="col-sm-2 control-label">Nro Nota</label>
+                        <label for="nro_resolucion" class="col-sm-2 control-label">Nro Resolucion</label>
 
                         <div class="col-sm-4">
                             {{ text_field('nro_resolucion','class': 'form-control','placeholder':'Ingrese el Nro de Resolucion') }}
