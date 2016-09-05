@@ -5,6 +5,7 @@
  * Date: 19/08/2016
  * Time: 9:04
  */
+use Phalcon\Paginator\Adapter\Model as Paginator;
 
 class SectoresController extends ControllerBase
 {
@@ -20,5 +21,6 @@ class SectoresController extends ControllerBase
         echo json_encode($retorno);
         return;
     }
+
 
 }

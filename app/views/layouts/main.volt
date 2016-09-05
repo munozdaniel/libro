@@ -206,8 +206,8 @@
                     <!-- /.form-group -->
                     <div class="form-group">
                         <label class="control-sidebar-subheading">
-                            {{ link_to('sectores/verSectores',' Ver Sectores','class':'') }}
-                            {{ link_to('sectores/verSectores','<i class="fa fa-arrow-right"></i>','class':'pull-right') }}
+                            {{ link_to('detallesector/verSectores',' Ver Sectores','class':'') }}
+                            {{ link_to('detallesector/verSectores','<i class="fa fa-arrow-right"></i>','class':'pull-right') }}
                         </label>
 
                         <p>
