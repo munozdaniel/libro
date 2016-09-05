@@ -10,9 +10,31 @@ class PaginaController extends ControllerBase
         $this->setDatatables();
 
         $numberPage = $this->request->getQuery("page", "int");
-        $parameters["order"] = "id_documento DESC";
+        $parameters["order"] = "pagina_id DESC";
 
         $acceso = Acceso::find(array('rol_id='.$rol_id));
+
+        if (count($acceso) == 0) {
+            $this->flashSession->warning("<i class='fa fa-warning'></i> No se encontraron permisos cargados");
+        }
+
+        $paginator = new Paginator(array(
+            "data" => $acceso,
+            "limit" => 10,
+            "page" => $numberPage
+        ));
+
+        $this->view->page = $paginator->getPaginate();
+    }
+    public function verPermisosAction()
+    {
+        $this->view->pick('pagina/verPermisosPorRol');
+        $this->setDatatables();
+
+        $numberPage = $this->request->getQuery("page", "int");
+        $parameters["order"] = "pagina_id DESC";
+
+        $acceso = Acceso::find($parameters);
 
         if (count($acceso) == 0) {
             $this->flashSession->warning("<i class='fa fa-warning'></i> No se encontraron permisos cargados");
