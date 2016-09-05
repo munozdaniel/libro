@@ -265,6 +265,103 @@ class DisposicionController extends ControllerBase
 
     }
 
+    /**
+     * Pregunta si esta seguro de eliminar la disposicion
+     * @param $id_documento
+     * @return null
+     */
+    public function eliminarAction($id_documento)
+    {
+        $documento = Disposicion::findFirst('id_documento=' . $id_documento);
+        if (!$documento) {
+            $this->flashSession->error("La disposicion no se encontró");
+            return $this->response->redirect("disposicion/listar");
+        }
+        if ($documento->getHabilitado() == 0) {
+            $this->flashSession->warning("La disposicion ya fue eliminada");
+            return $this->response->redirect("disposicion/listar");
+        }
+        $this->view->id_documento = $id_documento;
+    }
+
+
+    /**
+     * Elimina la disposicion de manera logica
+     * Si es la ultima disposicion: la disposicion anterior  debera convertirse en la ultima para que la numeracion continue.
+     * (debe ser del mismo año que la disposicion a eliminar)
+     * Si no es la ultima disposicion: se la deshabilita nada mas.
+     * @return null
+     */
+    public function eliminarLogicoAction()
+    {
+        if ($this->request->isPost()) {
+            $id_documento = $this->request->getPost('id_documento', 'int');
+
+            $documento = Disposicion::findFirst('id_documento=' . $id_documento);
+            if (!$documento) {
+                $this->flashSession->warning("La Disposicion no se encontró");
+                return $this->response->redirect("disposicion/listar");
+            }
+            $this->db->begin();
+            if ($documento->getUltimo() == 1) {
+
+                /*Si es el ultimo, al anteultimo se lo deja ultimo, para que el
+                 siguiente que se agregue continue con la numeracion*/
+                //Buscamos el anterior habilitado
+                $band = true;
+                $date = DateTime::createFromFormat("Y-m-d", $documento->getFecha());
+                $anio = $date->format("Y");
+                $id = $id_documento;
+                while ($band) {
+                    $id_anterior = ($id - 1);
+                    $anterior = Disposicion::findFirst('id_documento=' . $id_anterior . " AND fecha BETWEEN '$anio-01-01' AND '$anio-12-31'");
+                    if (!$anterior)//Si no existe anterior, entonces empezaria en 0 la siguiente disposicion que se ingrese
+                    {
+                        $band = false;//Corta el bucle
+                    } else {
+                        if ($anterior->getHabilitado() == 1) {
+                            $band = false;
+                            $anterior->setUltimo(1);
+                            if (!$anterior->update()) {
+                                $this->db->rollback();
+                                foreach ($anterior->getMessages() as $mensaje) {
+                                    $this->flash->error($mensaje);
+                                }
+                                return $this->redireccionar('disposicion/eliminar/' . $id_documento);
+                            }
+                        }
+                    }
+                    $id = ($id - 1);
+                }
+                $documento->setUltimo(0);
+                $documento->setHabilitado(0);
+                if (!$documento->update()) {
+                    $this->db->rollback();
+                    foreach ($documento->getMessages() as $mensaje) {
+                        $this->flash->error($mensaje);
+                    }
+                    return $this->redireccionar('disposicion/eliminar/' . $id_documento);
+                }
+                $this->db->commit();
+                $this->flash->success('La disposicion ' . $documento->getNroDisposicion() . ' ha sido deshabilitada');
+
+            } else {
+                /*Si no es el ultimo, se deshabilita*/
+                $documento->setUltimo(0);
+                $documento->setHabilitado(0);
+                if (!$documento->update()) {
+                    $this->db->rollback();
+                    foreach ($documento->getMessages() as $mensaje) {
+                        $this->flash->error($mensaje);
+                    }
+                    return $this->redireccionar('disposicion/eliminar/' . $id_documento);
+                }
+                $this->db->commit();
+                $this->flashSession->success('La disposicion ' . $documento->getNroDisposicion() . ' ha sido deshabilitada');
+            }
+        }
+        return $this->response->redirect("disposicion/listar");
+    }
 
     /* ====================================================
            BUSQUEDAS
