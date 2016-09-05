@@ -20,6 +20,98 @@ class DisposicionController extends ControllerBase
      */
     public function newAction()
     {
+        $this->persistent->parameters = null;
+
+        $this->assets->collection('headerCss')
+            ->addCss('plugins/select2/select2.min.css');
+        $this->assets->collection('footerJs')
+            ->addJs('plugins/select2/select2.full.min.js');
+        $this->assets->collection('footerInlineJs')
+            ->addInlineJs('
+            $(".autocompletar").select2();
+            $(document).ready( function() {
+                var now = new Date();
+                var day = ("0" + now.getDate()).slice(-2);
+                var month = ("0" + (now.getMonth() + 1)).slice(-2);
+                var today = now.getFullYear()+"-"+(month)+"-"+(day) ;
+                $(\'#fecha\').val(today);
+                });
+            ');
+        $this->view->form = new DisposicionForm(null, array('edit' => true, 'required' => true));
+
+    }
+    /**
+     * Creates a new disposicion
+     */
+    public function createAction()
+    {
+
+        if (!$this->request->isPost()) {
+            return $this->redireccionar("disposicion/listar");
+        }
+        $this->db->begin();
+
+        $form = new DisposicionForm();
+        $documento = new Disposicion();
+        // Recuperamos los datos por post y seteanmos la entidad
+        $data = $this->request->getPost();
+        $form->bind($data, $documento);
+        /*Obtenemos el ultimo numero de disposicion*/
+        $ultimo = Disposicion::findFirst("ultimo=1");
+        if (!$ultimo) {
+            $documento->setNroDisposicion(1);
+            $documento->setUltimo(1);
+        } else {
+            $ultimo->setUltimo(0);
+            if (!$ultimo->update()) {
+                $this->db->rollback();
+                foreach ($ultimo->getMessages() as $message) {
+                    $this->flash->error($message);
+                }
+                return $this->redireccionar('disposicion/new');
+            }
+            $documento->setNroDisposicion($ultimo->getNroDisposicion() + 1);
+            $documento->setUltimo(1);
+
+        }
+        /*Validamos el formulario*/
+        if (!$form->isValid()) {
+            $this->db->rollback();
+            foreach ($form->getMessages() as $message) {
+                $this->flash->error($message);
+            }
+            return $this->redireccionar('disposicion/new');
+        }
+        /*Seteamos los campos faltantes*/
+        $documento->setHabilitado(1);
+        $documento->setDescripcion(mb_strtoupper($documento->getDescripcion()));
+        $documento->setTipo(4);
+        /*Guardamos el adjunto*/
+        $archivos = $this->request->getUploadedFiles();
+        if ($archivos[0]->getName() != "") {
+
+            $nombreCarpeta = 'files/disposicion/' . date('Ymd') . '/' . $documento->getNroDisposicion();
+            $path = $this->guardarAdjunto($archivos, $nombreCarpeta);
+            if ($path == "") {
+                $this->flashSession->error("Edite la disposicion para volver a adjuntar el archivo.");
+            }
+            else{
+                $documento->setDisposicionAdjunto($path);
+            }
+        }
+        /*Guardamos la instancia en la bd*/
+        if ($documento->save() == false) {
+            $this->db->rollback();
+            foreach ($documento->getMessages() as $message) {
+                $this->flash->error($message);
+            }
+            return $this->redireccionar('disposicion/new');
+        }
+
+        $form->clear();
+        $this->db->commit();
+        $this->flashSession->success("La Disposicion ha sido creada correctamente");
+        return $this->response->redirect('disposicion/listar');
 
     }
 
@@ -106,51 +198,6 @@ class DisposicionController extends ControllerBase
         $this->db->commit();
         $this->flashSession->success("La Disposicion ha sido actualizada correctamente");
         return $this->response->redirect('disposicion/listar');
-
-    }
-    /**
-     * Creates a new disposicion
-     */
-    public function createAction()
-    {
-
-        if (!$this->request->isPost()) {
-            return $this->dispatcher->forward(array(
-                "controller" => "disposicion",
-                "action" => "index"
-            ));
-        }
-
-        $disposicion = new Disposicion();
-
-        $disposicion->setNroDisposicion($this->request->getPost("nro_disposicion"));
-        $disposicion->setCreadopor($this->request->getPost("creadopor"));
-        $disposicion->setDescripcion($this->request->getPost("descripcion"));
-        $disposicion->setFecha($this->request->getPost("fecha"));
-        $disposicion->setHabilitado($this->request->getPost("habilitado"));
-        $disposicion->setSectorIdOid($this->request->getPost("sector_id_oid"));
-        $disposicion->setTipo($this->request->getPost("tipo"));
-        $disposicion->setUltimo($this->request->getPost("ultimo"));
-        $disposicion->setDisposicionAdjunto($this->request->getPost("disposicion_adjunto"));
-        
-
-        if (!$disposicion->save()) {
-            foreach ($disposicion->getMessages() as $message) {
-                $this->flash->error($message);
-            }
-
-            return $this->dispatcher->forward(array(
-                "controller" => "disposicion",
-                "action" => "new"
-            ));
-        }
-
-        $this->flash->success("disposicion was created successfully");
-
-        return $this->dispatcher->forward(array(
-            "controller" => "disposicion",
-            "action" => "index"
-        ));
 
     }
 
