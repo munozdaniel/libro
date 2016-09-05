@@ -172,8 +172,9 @@
                     <div class="form-group">
                         <label class="control-sidebar-subheading">
                             {{ link_to('rol/verTodosLosRoles',' Ver Roles','class':'') }}
-                            <i class="fa fa-arrow-right pull-right"></i>
+                            {{ link_to('rol/verTodosLosRoles','<i class="fa fa-arrow-right"></i>','class':'pull-right') }}
                         </label>
+
                         <p>
                             Listado de todos los roles.
                         </p>
@@ -182,8 +183,8 @@
 
                     <div class="form-group">
                         <label class="control-sidebar-subheading">
-                            Ver Permisos
-                            {{ link_to('','<i class="fa fa-arrow-right"></i>','class':'pull-right') }}
+                            {{ link_to('pagina/verPermisos','    Ver Permisos','class':'') }}
+                            {{ link_to('pagina/verPermisos','<i class="fa fa-arrow-right"></i>','class':'pull-right') }}
                         </label>
 
                         <p>
@@ -194,12 +195,23 @@
 
                     <div class="form-group">
                         <label class="control-sidebar-subheading">
-                            Ver Usuarios
-                            {{ link_to('','<i class="fa fa-arrow-right"></i>','class':'pull-right') }}
+                            {{ link_to('usuarios/verUsuarios',' Ver Usuarios','class':'') }}
+                            {{ link_to('usuarios/verUsuarios','<i class="fa fa-arrow-right"></i>','class':'pull-right') }}
                         </label>
 
                         <p>
                             Listado de todos los usuarios registrados.
+                        </p>
+                    </div>
+                    <!-- /.form-group -->
+                    <div class="form-group">
+                        <label class="control-sidebar-subheading">
+                            {{ link_to('sectores/verSectores',' Ver Sectores','class':'') }}
+                            {{ link_to('sectores/verSectores','<i class="fa fa-arrow-right"></i>','class':'pull-right') }}
+                        </label>
+
+                        <p>
+                            Listado de todos los sectores registrados.
                         </p>
                     </div>
                     <!-- /.form-group -->
