@@ -21,9 +21,103 @@ class ExpedienteController extends ControllerBase
      */
     public function newAction()
     {
+        $this->persistent->parameters = null;
+
+        $this->assets->collection('headerCss')
+            ->addCss('plugins/select2/select2.min.css');
+        $this->assets->collection('footerJs')
+            ->addJs('plugins/select2/select2.full.min.js');
+        $this->assets->collection('footerInlineJs')
+            ->addInlineJs('
+            $(".autocompletar").select2();
+            $(document).ready( function() {
+                var now = new Date();
+                var day = ("0" + now.getDate()).slice(-2);
+                var month = ("0" + (now.getMonth() + 1)).slice(-2);
+                var today = now.getFullYear()+"-"+(month)+"-"+(day) ;
+                $(\'#fecha\').val(today);
+                });
+            ');
+        $this->view->form = new ExpedienteForm(null, array('edit' => true, 'required' => true));
+    }
+    /**
+     * Creates a new expediente
+     */
+    public function createAction()
+    {
+
+        if (!$this->request->isPost()) {
+            return $this->redireccionar("expediente/listar");
+        }
+        $this->db->begin();
+
+        $form = new ExpedienteForm();
+        $documento = new Expediente();
+        // Recuperamos los datos por post y seteanmos la entidad
+        $data = $this->request->getPost();
+        $form->bind($data, $documento);
+        /*Obtenemos el ultimo numero de expediente*/
+        $ultimo = Expediente::findFirst("ultimo=1");
+        if (!$ultimo) {
+            $documento->setNroExpediente(1);
+            $documento->setUltimo(1);
+        } else {
+            $ultimo->setUltimo(0);
+            if (!$ultimo->update()) {
+                $this->db->rollback();
+                foreach ($ultimo->getMessages() as $message) {
+                    $this->flash->error($message);
+                }
+                return $this->redireccionar('expediente/new');
+            }
+            $documento->setNroExpediente($ultimo->getNroExpediente() + 1);
+            $documento->setUltimo(1);
+
+        }
+        /*Validamos el formulario*/
+        if (!$form->isValid()) {
+            $this->db->rollback();
+            foreach ($form->getMessages() as $message) {
+                $this->flash->error($message);
+            }
+            return $this->redireccionar('expediente/new');
+        }
+        /*Seteamos los campos faltantes*/
+        $documento->setHabilitado(1);
+        $documento->setTipo(5);
+        $documento->setExpteCodAnio(date('Y'));
+        $documento->setExpteCodEmpresa("IMPS");
+        $documento->setExpteCodLetra(mb_strtoupper($documento->getExpteCodLetra()));
+        $documento->setDescripcion(mb_strtoupper($documento->getDescripcion()));
+        $documento->setExpteCodNumero($documento->getNroExpediente());
+        /*Guardamos el adjunto*/
+        $archivos = $this->request->getUploadedFiles();
+        if ($archivos[0]->getName() != "") {
+
+            $nombreCarpeta = 'files/expediente/' . date('Ymd') . '/' . $documento->getNroExpediente();
+            $path = $this->guardarAdjunto($archivos, $nombreCarpeta);
+            if ($path == "") {
+                $this->flashSession->error("Edite la expediente para volver a adjuntar el archivo.");
+            }
+            else{
+                $documento->setExpedienteAdjunto($path);
+            }
+        }
+        /*Guardamos la instancia en la bd*/
+        if ($documento->save() == false) {
+            $this->db->rollback();
+            foreach ($documento->getMessages() as $message) {
+                $this->flash->error($message);
+            }
+            return $this->redireccionar('expediente/new');
+        }
+
+        $form->clear();
+        $this->db->commit();
+        $this->flashSession->success("El Expediente ha sido creada correctamente");
+        return $this->response->redirect('expediente/listar');
 
     }
-
     /**
      * Edits a expediente
      *
@@ -114,56 +208,7 @@ class ExpedienteController extends ControllerBase
         return $this->response->redirect('expediente/listar');
 
     }
-    /**
-     * Creates a new expediente
-     */
-    public function createAction()
-    {
 
-        if (!$this->request->isPost()) {
-            return $this->dispatcher->forward(array(
-                "controller" => "expediente",
-                "action" => "index"
-            ));
-        }
-
-        $expediente = new Expediente();
-
-        $expediente->setExpteCodAnio($this->request->getPost("expte_cod_anio"));
-        $expediente->setExpteCodEmpresa($this->request->getPost("expte_cod_empresa"));
-        $expediente->setExpteCodLetra($this->request->getPost("expte_cod_letra"));
-        $expediente->setExpteCodNumero($this->request->getPost("expte_cod_numero"));
-        $expediente->setNroExpediente($this->request->getPost("nro_expediente"));
-        $expediente->setCreadopor($this->request->getPost("creadopor"));
-        $expediente->setDescripcion($this->request->getPost("descripcion"));
-        $expediente->setFecha($this->request->getPost("fecha"));
-        $expediente->setHabilitado($this->request->getPost("habilitado"));
-        $expediente->setSectorIdOid($this->request->getPost("sector_id_oid"));
-        $expediente->setTipo($this->request->getPost("tipo"));
-        $expediente->setUltimo($this->request->getPost("ultimo"));
-        $expediente->setExpedienteUltimamodificacion($this->request->getPost("expediente_ultimaModificacion"));
-        $expediente->setExpedienteAdjunto($this->request->getPost("expediente_adjunto"));
-        
-
-        if (!$expediente->save()) {
-            foreach ($expediente->getMessages() as $message) {
-                $this->flash->error($message);
-            }
-
-            return $this->dispatcher->forward(array(
-                "controller" => "expediente",
-                "action" => "new"
-            ));
-        }
-
-        $this->flash->success("expediente was created successfully");
-
-        return $this->dispatcher->forward(array(
-            "controller" => "expediente",
-            "action" => "index"
-        ));
-
-    }
 
 
 
