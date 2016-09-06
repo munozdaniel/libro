@@ -75,7 +75,17 @@ class ExpedienteForm extends Form
         ));
         $this->add($elemento);
         /*========================== SECTOR ORIGEN ==========================*/
-        $elemento = new Select('sector_id_oid', Sectores::find(array('sector_activo=1 AND sector_id!=1')), array(
+        $sectores = $this->modelsManager->createBuilder()
+            ->columns(array('S.sector_id','S.sector_nombre'))
+            ->from(
+                array('S' => 'Sectores','D' => 'Detallesector')
+            )
+            ->where(' S.sector_activo=1 AND  S.sector_id!=1
+                        AND D.detalleSector_expediente=1
+                            AND S.sector_id=D.detalleSector_sectorId ')
+            ->getQuery()
+            ->execute();
+        $elemento = new Select('sector_id_oid', $sectores, array(
             'using' => array('sector_id', 'sector_nombre'),
             'useEmpty' => true,
             'emptyText' => 'Seleccionar ',
