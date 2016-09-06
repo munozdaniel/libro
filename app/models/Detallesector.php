@@ -183,6 +183,7 @@ class Detallesector extends \Phalcon\Mvc\Model
     public function initialize()
     {
         $this->belongsTo('detalleSector_sectorId', 'Sectores', 'sector_id', array('alias' => 'Sectores'));
+
     }
 
     /**

@@ -128,6 +128,8 @@ class Sectores extends \Phalcon\Mvc\Model
         //Deberia ser de solo lectura
         $this->setReadConnectionService('dbUsuarios');
         $this->hasMany('sector_id', 'Usuarios', 'usuario_sector', array('alias' => 'Usuarios'));
+        $this->setSchema('gestionusuarios');
+
     }
 
     /**
