@@ -369,4 +369,11 @@ div.DTFC_RightBodyWrapper table.dataTable thead .sorting_desc:after {
 div.FixedHeader_Cloned table {
 	margin: 0 !important
 }
-
+/*  ICONO TABLA */
+td.details-control {
+    background: url("images/plus.png") no-repeat center center !important;
+    cursor: pointer;
+}
+tr.shown td.details-control {
+    background: url('images/plus.png') no-repeat center center !important;
+}

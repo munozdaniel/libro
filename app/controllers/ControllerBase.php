@@ -24,7 +24,8 @@ class ControllerBase extends Controller
     protected function setDatatables()
     {
         $this->assets->collection('headerCss')
-            ->addCss('plugins/datatables/dataTables.bootstrap.css');
+            ->addCss('plugins/datatables/dataTables.bootstrap.css')
+            ->addCss('plugins/datatables/jquery.dataTables.min.css');
         $this->assets->collection('footerJs')
             ->addJs('plugins/datatables/jquery.dataTables.min.js')
             ->addJs('plugins/datatables/dataTables.bootstrap.min.js');
