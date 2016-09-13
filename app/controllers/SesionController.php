@@ -66,7 +66,9 @@ class SesionController extends ControllerBase
             $this->session->set('auth', array('usuario_id' => $usuario->usuario_id,
                 'usuario_nombreCompleto' => $usuario->usuario_nombreCompleto,
                 'usuario_nick' => $usuario->usuario_nick,
-                'rol_nombre' => $rol->rol_nombre));
+                'rol_nombre' => $rol->rol_nombre,
+                'rol_id' => $rol->rol_id)
+            );
             return true;
         }
     }
