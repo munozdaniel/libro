@@ -83,7 +83,7 @@
                             </span>
                     </a>
                     <ul class="treeview-menu">
-                        <li>{{ link_to('nota/listar','<i class="fa fa-circle-o "></i> <span>Listado</span>') }}</li>
+                        <li>{{ link_to('nota/listarData','<i class="fa fa-circle-o "></i> <span>Listado</span>') }}</li>
                         <li>{{ link_to('nota/new','<i class="fa fa-circle-o "></i> <span>Nuevo</span>') }}</li>
                         <li>{{ link_to('nota/index','<i class="fa fa-circle-o "></i> <span>Buscar</span>') }}</li>
                     </ul>

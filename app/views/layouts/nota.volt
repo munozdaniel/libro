@@ -16,7 +16,7 @@
                 <div class="box-tools pull-right">
                     {{ link_to('nota','<i class="fa fa-search"></i> Búscar Nota','class':'btn btn-primary btn-flat') }}
                     {{ link_to('nota/new','<i class="fa fa-plus-square"></i> Agregar Nota','class':'btn btn-primary btn-flat') }}
-                    {{ link_to('nota/listar','<i class="fa fa-list"></i> Listar Notas','class':'btn btn-primary btn-flat') }}
+                    {{ link_to('nota/listarData','<i class="fa fa-list"></i> Listar Notas','class':'btn btn-primary btn-flat') }}
                 </div>
             </div>
             <div class="box-body">
