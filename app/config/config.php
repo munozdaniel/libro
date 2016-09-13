@@ -1,21 +1,22 @@
 <?php
 
 defined('APP_PATH') || define('APP_PATH', realpath('.'));
+set_time_limit(300);
 
 return new \Phalcon\Config(array(
     'database' => array(
         'adapter'     => 'Mysql',
-        'host'        => '192.168.42.14',
+        'host'        => 'localhost',
         'username'    => 'root',
-        'password'    => 'infoimps',
+        'password'    => '',
         'dbname'      => 'libro',
         'charset'     => 'utf8',
     ),
     'gestionusuarios' => array(
         'adapter'     => 'Mysql',
-        'host'        => '201.251.125.209:4880',
+        'host'        => 'localhost',
         'username'    => 'root',
-        'password'    => 'infoimps',
+        'password'    => '',
         'dbname'      => 'gestionusuarios',
         'charset'     => 'utf8',
     ),
@@ -28,6 +29,7 @@ return new \Phalcon\Config(array(
         'libraryDir'     => APP_PATH . '/app/library/',
         'mpdfDir'        => APP_PATH . '/app/library/mpdf/',
         'formsDir'       => APP_PATH . '/app/forms/',
+        'componentesDir'       => APP_PATH . '/app/library/componentes/',
         'cacheDir'       => APP_PATH . '/app/cache/',
         'baseUri'        => '/libro/',
     )
