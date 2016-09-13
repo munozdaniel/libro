@@ -561,6 +561,8 @@ class Nota extends \Phalcon\Mvc\Model
     {
         $this->belongsTo('nota_sectorOrigenId', 'Sectores', 'sector_id', array('alias' => 'Sectores'));
         $this->belongsTo('sector_id_oid', 'Sector', 'id', array('alias' => 'Sector'));
+        $this->setSchema('libro');
+
     }
 
     /**
