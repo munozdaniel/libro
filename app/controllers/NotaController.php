@@ -498,4 +498,48 @@ class NotaController extends ControllerBase
         $this->view->page = $paginator->getPaginate();
     }
 
+    public function listarDataAction()
+    {
+        $this->setDatatables();
+
+    }
+
+    public function listarDataAjaxAction()
+    {
+        $this->view->disable();
+        $select = array('N.nro_nota','DATE_FORMAT( fecha,  \'%d/%m/%Y\' ) AS fecha','S.sector_nombre','N.destino','N.descripcion','N.habilitado','N.id_documento');
+        $from = array('N' => 'Nota','S'=>'Sectores');
+        if( $this->session->get('auth')['rol_id']==2)//Administrador
+        {
+            $where = 'S.sector_id=N.sector_id_oid ';
+        }
+        else
+        {
+            $ultimo_anio= date('Y');
+            $desde = $ultimo_anio."-01-01";
+            $hasta = date('Y-m-d');
+            $where = "S.sector_id=N.sector_id_oid AND N.habilitado=1 AND (fecha BETWEEN '$desde' AND '$hasta')";
+        }
+        $order_default = "id_documento DESC";
+        $columnas_dt = array(
+            array( 'db' => 'nro_nota', 'dt' => 0,
+                'formatter' => function( $d, $row ) {
+                    return '$'.number_format($d);
+                } ),
+            array( 'db' => 'fecha',  'dt' => 1,
+                'formatter' => function( $d, $row ) {
+                    return date( 'd/M/Y', strtotime($d));
+                } ),
+            array( 'db' => 'sector_nombre',   'dt' => 2 ),
+            array( 'db' => 'destino',     'dt' => 3 ),
+            array( 'db' => 'descripcion',     'dt' => 4 )
+        );
+        $retorno = ServerSide::simpleQuery($this->request,$this->modelsManager,$select,$from,$where,$order_default,$columnas_dt);
+        echo json_encode($retorno);
+        return;
+    }
+
+
+
+
 }
