@@ -1,7 +1,19 @@
 <style>
-
+  tr {
+      background-color: #2a3e47;
+      color: #FFF;
+  }
+    tr > td {
+        color: #000;
+    }
+  .table-bordered>thead>tr>th, .table-bordered>tbody>tr>th, .table-bordered>tfoot>tr>th, .table-bordered>thead>tr>td, .table-bordered>tbody>tr>td, .table-bordered>tfoot>tr>td {
+      border: 1px solid #d9d9d9;
+  }
+  table.dataTable thead .sorting {
+      background-image: none;
+  }
 </style>
-<table id="example" class="display" cellspacing="0" width="100%">
+<table id="example" class="table-bordered display" cellspacing="0" width="100%">
     <thead>
     <tr>
         <th></th>
@@ -44,7 +56,7 @@
     $(document).ready(function() {
         var table = $('#example').DataTable( {
             "language": {
-                "url": "//cdn.datatables.net/plug-ins/1.10.12/i18n/Spanish.json"
+                "url": "/libro/public/plugins/datatables/extensions/language/Spanish.json"
             },
             "processing": true,
             "serverSide": true,
