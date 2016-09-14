@@ -447,7 +447,10 @@ class NotaController extends ControllerBase
         $this->view->page = $paginator->getPaginate();
     }
 
-
+    /**
+     * Busqueda entre 2 nros
+     * @return \Phalcon\Http\Response|\Phalcon\Http\ResponseInterface
+     */
     public function searchEntreNumerosAction()
     {
         $this->setDatatables();
@@ -498,12 +501,18 @@ class NotaController extends ControllerBase
         $this->view->page = $paginator->getPaginate();
     }
 
+    /**
+     * Listar Las Notas
+     */
     public function listarDataAction()
     {
         $this->setDatatables();
 
     }
 
+    /**
+     * Paginado del lado del servidor. Filtro y orden dinamico.
+     */
     public function listarDataAjaxAction()
     {
         $this->view->disable();
