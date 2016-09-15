@@ -549,4 +549,51 @@ class ExpedienteController extends ControllerBase
         $this->view->page = $paginator->getPaginate();
     }
 
+    /**
+     * Listar Expedientes
+     */
+    public function listarDataAction()
+    {
+        $this->setDatatables();
+    }
+
+    /**
+     * Paginado del lado del servidor. Filtro y orden dinamico.
+     */
+    public function listarDataAjaxAction()
+    {
+        $this->view->disable();
+        $select = array('E.nro_expediente','DATE_FORMAT( E.fecha,  \'%d/%m/%Y\' ) AS fecha','S.sector_nombre AS origen','E.expte_cod_empresa AS empresa','E.expte_cod_letra AS letra','E.expte_cod_anio AS anio','E.descripcion','E.habilitado','E.id_documento');
+        $from = array('E' => 'Expediente','S'=>'Sectores');
+        if( $this->session->get('auth')['rol_id']==2)//Administrador
+        {
+            $where = 'S.sector_id=E.sector_id_oid ';
+        }
+        else
+        {
+            $ultimo_anio= date('Y');
+            $desde = $ultimo_anio."-01-01";
+            $hasta = date('Y-m-d');
+            $where = "S.sector_id=E.sector_id_oid AND E.habilitado=1 AND (E.fecha BETWEEN '$desde' AND '$hasta')";
+        }
+        $order_default = "id_documento DESC";
+        $columnas_dt = array(
+            array('data'=>'nro_expediente', 'db' => 'E.nro_expediente', 'dt' => 0,
+                'formatter' => function( $d, $row ) {
+                    return '$'.number_format($d);
+                } ),
+            array('data'=>'fecha', 'db' => 'F.fecha',  'dt' => 1,
+                'formatter' => function( $d, $row ) {
+                    return date( 'd/M/Y', strtotime($d));
+                } ),
+            array('data'=>'origen', 'db' => 'S.sector_nombre',   'dt' => 2 ),
+            array('data'=>'empresa', 'db' => 'E.expte_cod_empresa',   'dt' => 2 ),
+            array('data'=>'letra', 'db' => 'E.expte_cod_letra',   'dt' => 2 ),
+            array('data'=>'anio', 'db' => 'E.expte_cod_anio',   'dt' => 2 ),
+            array('data'=>'descripcion', 'db' => 'E.descripcion',     'dt' => 4 )
+        );
+        $retorno = ServerSide::simpleQuery($this->request,$this->modelsManager,$select,$from,$where,$order_default,$columnas_dt);
+        echo json_encode($retorno);
+        return;
+    }
 }
