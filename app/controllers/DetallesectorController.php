@@ -139,7 +139,7 @@ class DetallesectorController extends ControllerBase
 
         return $this->dispatcher->forward(array(
             "controller" => "detallesector",
-            "action" => "index"
+            "action" => "verSectores"
         ));
 
     }
