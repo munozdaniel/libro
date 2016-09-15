@@ -120,11 +120,10 @@ class MemoController extends ControllerBase
             $memo->setHabilitado(1);
             $memo->setDescripcion(mb_strtoupper($memo->getDescripcion()));
 
-            if($memo->getDestinosectorIdOid()==1)
-                if(trim($this->request->getPost('otrodestino'))!="")
+            if ($memo->getDestinosectorIdOid() == 1)
+                if (trim($this->request->getPost('otrodestino')) != "")
                     $memo->setOtrodestino(mb_strtoupper($this->request->getPost('otrodestino')));
-                else
-                {
+                else {
                     $this->flash->error("Ingrese otro destino");
                     $form->clear(array('destinosector_id_oid'));
                     return $this->redireccionar('memo/new');
@@ -139,8 +138,7 @@ class MemoController extends ControllerBase
                 $path = $this->guardarAdjunto($archivos, $nombreCarpeta);
                 if ($path == "") {
                     $this->flashSession->error("Edite el memo para volver a adjuntar el archivo.");
-                }
-                else {
+                } else {
                     $memo->setMemoAdjunto($path);
                 }
             }
@@ -173,7 +171,7 @@ class MemoController extends ControllerBase
 
         $id = $this->request->getPost("id_documento", "int");
 
-        $memo = Memo::findFirst("id_documento=" .$id);
+        $memo = Memo::findFirst("id_documento=" . $id);
         if (!$memo) {
             $this->flash->error("El memo no pudo ser editado.");
             return $this->redireccionar("memo/listar");
@@ -205,7 +203,7 @@ class MemoController extends ControllerBase
         }
         /*Actualizamos los datos*/
         $memo->setDescripcion(mb_strtoupper($memo->getDescripcion()));
-        if($memo->getDestinosectorIdOid()==1)
+        if ($memo->getDestinosectorIdOid() == 1)
             $memo->setOtrodestino(mb_strtoupper($memo->getOtrodestino()));
 
         if ($memo->save() == false) {
@@ -261,6 +259,7 @@ class MemoController extends ControllerBase
             "action" => "index"
         ));
     }
+
     public function verAction($id_documento)
     {
         $this->assets->collection('headerCss')
@@ -281,6 +280,7 @@ class MemoController extends ControllerBase
         $this->view->form = new MemoForm($memo, array('edit' => true, 'readOnly' => true, 'required' => true));
 
     }
+
     /**
      * Pregunta si esta seguro de eliminar la memo
      * @param $id_documento
@@ -378,6 +378,7 @@ class MemoController extends ControllerBase
         }
         return $this->response->redirect("memo/listar");
     }
+
     /* ====================================================
            BUSQUEDAS
        =======================================================*/
@@ -570,4 +571,60 @@ class MemoController extends ControllerBase
         $this->view->page = $paginator->getPaginate();
     }
 
+    /**
+     * Listar Memo
+     */
+    public function listarDataAction()
+    {
+        $this->setDatatables();
+
+    }
+
+    /**
+     * Paginado del lado del servidor. Filtro y orden dinamico.
+     */
+    public function listarDataAjaxAction()
+    {
+        /*
+            SELECT M.nro_memo, M.fecha, S.sector_nombre, SS.sector_nombre,IF(M.destinosector_id_oid= 1, M.otrodestino, SS.sector_nombre) as DESTINY, M.descripcion
+            FROM `memo` AS M, gestionusuarios.sectores AS S, gestionusuarios.sectores AS SS
+            WHERE S.sector_id=M.sector_id_oid
+            AND SS.sector_id=M.destinosector_id_oid
+         */
+        $this->view->disable();
+        $select = array('M.nro_memo', 'DATE_FORMAT( M.fecha,  \'%d/%m/%Y\' ) AS fecha', 'S.sector_nombre AS origen',
+            'IF(M.destinosector_id_oid= 1, M.otrodestino, SS.sector_nombre) as destino',
+            'M.descripcion', 'M.habilitado', 'M.id_documento');
+        $from = array('M' => 'Memo', 'S' => 'Sectores', 'SS' => 'Sectores');
+        if ($this->session->get('auth')['rol_id'] == 2)//Administrador
+        {
+            $where = 'S.sector_id=M.sector_id_oid
+            AND SS.sector_id=M.destinosector_id_oid ';
+        } else {
+            $ultimo_anio = date('Y');
+            $desde = $ultimo_anio . "-01-01";
+            $hasta = date('Y-m-d');
+            $where = "S.sector_id=M.sector_id_oid
+            AND SS.sector_id=M.destinosector_id_oid AND N.habilitado=1 AND (fecha BETWEEN '$desde' AND '$hasta')";
+        }
+        $order_default = "id_documento DESC";
+        $columnas_dt = array(
+            array('data' => 'nro_memo','db' => 'nro_memo', 'dt' => 0,
+                'formatter' => function ($d, $row) {
+                    return '$' . number_format($d);
+                }),
+            array('data' => 'fecha','db' => 'fecha', 'dt' => 1,
+                'formatter' => function ($d, $row) {
+                    return date('d/M/Y', strtotime($d));
+                }),
+            array('data' => 'origen','db' => 'S.sector_nombre', 'dt' => 2),
+            array('data' => 'destino','db' => 'SS.sector_nombre', 'dt' => 3),
+            array('data' => 'descripcion','db' => 'descripcion', 'dt' => 4)
+        );
+        $request = $this->request;
+        $modelManager = $this->modelsManager;
+        $retorno = ServerSide::simpleQuery($request, $modelManager, $select, $from, $where, $order_default, $columnas_dt);
+        echo json_encode($retorno);
+        return;
+    }
 }
