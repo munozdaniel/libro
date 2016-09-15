@@ -605,7 +605,7 @@ class MemoController extends ControllerBase
             $desde = $ultimo_anio . "-01-01";
             $hasta = date('Y-m-d');
             $where = "S.sector_id=M.sector_id_oid
-            AND SS.sector_id=M.destinosector_id_oid AND N.habilitado=1 AND (fecha BETWEEN '$desde' AND '$hasta')";
+            AND SS.sector_id=M.destinosector_id_oid AND M.habilitado=1 AND (M.fecha BETWEEN '$desde' AND '$hasta')";
         }
         $order_default = "id_documento DESC";
         $columnas_dt = array(
