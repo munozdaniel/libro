@@ -538,5 +538,48 @@ class DisposicionController extends ControllerBase
 
         $this->view->page = $paginator->getPaginate();
     }
+    /**
+     * Listar Las Disposiciones
+     */
+    public function listarDataAction()
+    {
+        $this->setDatatables();
+    }
 
+    /**
+     * Paginado del lado del servidor. Filtro y orden dinamico.
+     */
+    public function listarDataAjaxAction()
+    {
+        $this->view->disable();
+        $select = array('D.nro_disposicion','DATE_FORMAT( D.fecha,  \'%d/%m/%Y\' ) AS fecha','S.sector_nombre AS origen','D.descripcion','D.habilitado','D.id_documento');
+        $from = array('D' => 'Disposicion','S'=>'Sectores');
+        if( $this->session->get('auth')['rol_id']==2)//Administrador
+        {
+            $where = 'S.sector_id=D.sector_id_oid ';
+        }
+        else
+        {
+            $ultimo_anio= date('Y');
+            $desde = $ultimo_anio."-01-01";
+            $hasta = date('Y-m-d');
+            $where = "S.sector_id=D.sector_id_oid AND D.habilitado=1 AND (D.fecha BETWEEN '$desde' AND '$hasta')";
+        }
+        $order_default = "id_documento DESC";
+        $columnas_dt = array(
+            array('data'=>'nro_disposicion', 'db' => 'D.nro_disposicion', 'dt' => 0,
+                'formatter' => function( $d, $row ) {
+                    return '$'.number_format($d);
+                } ),
+            array('data'=>'origen', 'db' => 'S.sector_nombre',   'dt' => 2 ),
+            array('data'=>'fecha', 'db' => 'F.fecha',  'dt' => 1,
+                'formatter' => function( $d, $row ) {
+                    return date( 'd/M/Y', strtotime($d));
+                } ),
+            array('data'=>'descripcion', 'db' => 'D.descripcion',     'dt' => 4 )
+        );
+        $retorno = ServerSide::simpleQuery($this->request,$this->modelsManager,$select,$from,$where,$order_default,$columnas_dt);
+        echo json_encode($retorno);
+        return;
+    }
 }
