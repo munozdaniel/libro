@@ -553,5 +553,49 @@ class ResolucionesController extends ControllerBase
 
         $this->view->page = $paginator->getPaginate();
     }
+    /**
+     * Listar Las Resoluciones
+     */
+    public function listarDataAction()
+    {
+        $this->setDatatables();
 
+    }
+
+    /**
+     * Paginado del lado del servidor. Filtro y orden dinamico.
+     */
+    public function listarDataAjaxAction()
+    {
+        $this->view->disable();
+        $select = array('R.nro_resolucion','DATE_FORMAT( R.fecha,  \'%d/%m/%Y\' ) AS fecha','S.sector_nombre AS origen','R.descripcion','R.habilitado','R.id_documento');
+        $from = array('R' => 'Resoluciones','S'=>'Sectores');
+        if( $this->session->get('auth')['rol_id']==2)//Administrador
+        {
+            $where = 'S.sector_id=R.sector_id_oid ';
+        }
+        else
+        {
+            $ultimo_anio= date('Y');
+            $desde = $ultimo_anio."-01-01";
+            $hasta = date('Y-m-d');
+            $where = "S.sector_id=R.sector_id_oid AND R.habilitado=1 AND (R.fecha BETWEEN '$desde' AND '$hasta')";
+        }
+        $order_default = "id_documento DESC";
+        $columnas_dt = array(
+            array('data'=>'nro_resolucion', 'db' => 'R.nro_resolucion', 'dt' => 0,
+                'formatter' => function( $d, $row ) {
+                    return '$'.number_format($d);
+                } ),
+            array('data'=>'origen', 'db' => 'S.sector_nombre',   'dt' => 2 ),
+            array('data'=>'fecha', 'db' => 'F.fecha',  'dt' => 1,
+                'formatter' => function( $d, $row ) {
+                    return date( 'd/M/Y', strtotime($d));
+                } ),
+            array('data'=>'descripcion', 'db' => 'R.descripcion',     'dt' => 4 )
+        );
+        $retorno = ServerSide::simpleQuery($this->request,$this->modelsManager,$select,$from,$where,$order_default,$columnas_dt);
+        echo json_encode($retorno);
+        return;
+    }
 }

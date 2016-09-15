@@ -299,6 +299,7 @@ class Resoluciones extends \Phalcon\Mvc\Model
     public function initialize()
     {
         $this->belongsTo('sector_id_oid', 'Sectores', 'sector_id', array('alias' => 'Sector'));
+        $this->setSchema('libro');
     }
 
     /**
