@@ -46,9 +46,9 @@
         return '<table cellpadding="5" cellspacing="0" border="0" style="padding-left:50px;">'+
                 '<tr>'+
                  estado +
-                '<td><a class="btn btn-default" href="/libro/memo/ver/'+ d.id_documento+'" target="_blank"> <i class="fa fa-file"></i> Ver Detalles </a></td>'+
+                '<td><a class="btn btn-default" href="/libro/disposicion/ver/'+ d.id_documento+'" target="_blank"> <i class="fa fa-file"></i> Ver Detalles </a></td>'+
                 '<td></td>'+
-                '<td> <a class="btn btn-default" href="/libro/caratula/memo/'+ d.id_documento+'" target="_blank"> <i class="fa fa-file-o"></i> Caratula </a></td>'+
+                '<td> <a class="btn btn-default" href="/libro/caratula/disposicion/'+ d.id_documento+'" target="_blank"> <i class="fa fa-file-o"></i> Caratula </a></td>'+
                 '</table>';
     }
     $(document).ready(function() {
