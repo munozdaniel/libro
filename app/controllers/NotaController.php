@@ -531,17 +531,17 @@ class NotaController extends ControllerBase
         }
         $order_default = "id_documento DESC";
         $columnas_dt = array(
-            array( 'db' => 'nro_nota', 'dt' => 0,
+            array('data'=>'nro_nota', 'db' => 'nro_nota', 'dt' => 0,
                 'formatter' => function( $d, $row ) {
                     return '$'.number_format($d);
                 } ),
-            array( 'db' => 'fecha',  'dt' => 1,
+            array('data'=>'fecha', 'db' => 'fecha',  'dt' => 1,
                 'formatter' => function( $d, $row ) {
                     return date( 'd/M/Y', strtotime($d));
                 } ),
-            array( 'db' => 'sector_nombre',   'dt' => 2 ),
-            array( 'db' => 'destino',     'dt' => 3 ),
-            array( 'db' => 'descripcion',     'dt' => 4 )
+            array('data'=>'sector_nombre', 'db' => 'sector_nombre',   'dt' => 2 ),
+            array('data'=>'destino', 'db' => 'destino',     'dt' => 3 ),
+            array('data'=>'descripcion', 'db' => 'descripcion',     'dt' => 4 )
         );
         $retorno = ServerSide::simpleQuery($this->request,$this->modelsManager,$select,$from,$where,$order_default,$columnas_dt);
         echo json_encode($retorno);

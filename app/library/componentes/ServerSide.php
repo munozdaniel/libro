@@ -35,6 +35,14 @@ class ServerSide
        }
        else
             $where = $where_plus;
+        //Para ver la query
+        $q = $modelsManager->createBuilder()
+            ->columns($select)
+            ->from($from)
+            ->where($where)//FIXME: falla si el usuario no especifica where
+            ->limit($limite[0],$limite[1])//2 parametros: Cantidad y registro inicial
+            ->orderBy($order)//FIXME: falla si el usuario no especifica el orden
+            ->getPhql();
         $retorno = $modelsManager->createBuilder()
             ->columns($select)
             ->from($from)
@@ -55,6 +63,7 @@ class ServerSide
         return array(
             "draw" => intval($request->getPost('draw')),
             "recordsTotal" => $total,
+            "q" =>$q,
             "recordsFiltered" => $total,
             "data" => $retorno->toArray()
         );
@@ -102,12 +111,14 @@ class ServerSide
         $columnSearch = array();
         //$columns = ServerSide::convertirColumnas($columns);
 
-        $dtColumns = ServerSide::pluck( $columns, 'db' );
+        $dtColumns = ServerSide::pluck( $columns, 'data' );
         $s = $request->getPost('search');
         if ( isset($s) && $s['value'] != '' ) {
             $str = $s['value'];
             for ( $i=0, $ien=count($request->getPost('columns')) ; $i<$ien ; $i++ ) {
+
                 $requestColumn = $request->getPost('columns')[$i];
+                //echo json_encode(array("requestColumn"=>$requestColumn['data'],'dtColumns'=>$dtColumns));
                 $columnIdx = array_search( $requestColumn['data'], $dtColumns );
                 $column = $columns[ $columnIdx ];
                 if ( $requestColumn['searchable'] == 'true' ) {
@@ -116,7 +127,10 @@ class ServerSide
                 }
 
             }
+
         }
+
+
         // Individual column filtering
         for ( $i=0, $ien=count($request->getPost('columns')) ; $i<$ien ; $i++ ) {
             $requestColumn = $request->getPost('columns')[$i];
