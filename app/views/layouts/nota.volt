@@ -12,7 +12,7 @@
             <div class="box-header with-border">
                 <h3 class="box-title"><button onclick="goBack()"><i class="fa fa-chevron-circle-left"></i></button>
 
-                    NOTAS</h3>
+                   <strong style="    font-size: 32px;">NOTAS</strong></h3>
                 <div class="box-tools pull-right">
                     {{ link_to('nota','<i class="fa fa-search"></i> Búscar Nota','class':'btn btn-primary btn-flat') }}
                     {{ link_to('nota/new','<i class="fa fa-plus-square"></i> Agregar Nota','class':'btn btn-primary btn-flat') }}

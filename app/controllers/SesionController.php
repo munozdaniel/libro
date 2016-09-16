@@ -35,7 +35,7 @@ class SesionController extends ControllerBase
                         $miSesion = $this->session->get('auth');
                         $this->flash->notice("Bienvenido/a " . $miSesion['usuario_nombreCompleto']);
                         //Redireccionar la ejecución si el usuario es valido
-                        return $this->redireccionar('nota/search');
+                        return $this->redireccionar('nota/listarData');
                     } else {
                         $this->flash->message('aviso', "<p>EL USUARIO NO TIENE LOS ROLES NECESARIOS PARA ADMINISTRAR</p>");
                         return $this->redireccionar('index/index');

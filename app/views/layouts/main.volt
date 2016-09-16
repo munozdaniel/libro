@@ -96,7 +96,7 @@
                             </span>
                     </a>
                     <ul class="treeview-menu">
-                        <li>{{ link_to('memo/listar','<i class="fa fa-circle-o "></i> <span>Listado</span>') }}</li>
+                        <li>{{ link_to('memo/listarData','<i class="fa fa-circle-o "></i> <span>Listado</span>') }}</li>
                         <li>{{ link_to('memo/new','<i class="fa fa-circle-o "></i> <span>Nuevo</span>') }}</li>
                         <li>{{ link_to('memo/index','<i class="fa fa-circle-o "></i> <span>Buscar</span>') }}</li>
                     </ul>
@@ -109,7 +109,7 @@
                             </span>
                     </a>
                     <ul class="treeview-menu">
-                        <li>{{ link_to('resoluciones/listar','<i class="fa fa-circle-o "></i> <span>Listado</span>') }}</li>
+                        <li>{{ link_to('resoluciones/listarData','<i class="fa fa-circle-o "></i> <span>Listado</span>') }}</li>
                         <li>{{ link_to('resoluciones/new','<i class="fa fa-circle-o "></i> <span>Nuevo</span>') }}</li>
                         <li>{{ link_to('resoluciones/index','<i class="fa fa-circle-o "></i> <span>Buscar</span>') }}</li>
                     </ul>
@@ -122,7 +122,7 @@
                             </span>
                     </a>
                     <ul class="treeview-menu">
-                        <li>{{ link_to('disposicion/listar','<i class="fa fa-circle-o "></i> <span>Listado</span>') }}</li>
+                        <li>{{ link_to('disposicion/listarData','<i class="fa fa-circle-o "></i> <span>Listado</span>') }}</li>
                         <li>{{ link_to('disposicion/new','<i class="fa fa-circle-o "></i> <span>Nuevo</span>') }}</li>
                         <li>{{ link_to('disposicion/index','<i class="fa fa-circle-o "></i> <span>Buscar</span>') }}</li>
                     </ul>
@@ -135,7 +135,7 @@
                             </span>
                     </a>
                     <ul class="treeview-menu">
-                        <li>{{ link_to('expediente/listar','<i class="fa fa-circle-o "></i> <span>Listado</span>') }}</li>
+                        <li>{{ link_to('expediente/listarData','<i class="fa fa-circle-o "></i> <span>Listado</span>') }}</li>
                         <li>{{ link_to('expediente/new','<i class="fa fa-circle-o "></i> <span>Nuevo</span>') }}</li>
                         <li>{{ link_to('expediente/index','<i class="fa fa-circle-o "></i> <span>Buscar</span>') }}</li>
                     </ul>
