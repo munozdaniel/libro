@@ -25,24 +25,6 @@ class Nota extends \Phalcon\Mvc\Model
      *
      * @var string
      */
-    protected $adjunto;
-
-    /**
-     *
-     * @var string
-     */
-    protected $adjuntar;
-
-    /**
-     *
-     * @var string
-     */
-    protected $adjuntar_0;
-
-    /**
-     *
-     * @var string
-     */
     protected $creadopor;
 
     /**
@@ -65,12 +47,6 @@ class Nota extends \Phalcon\Mvc\Model
 
     /**
      *
-     * @var string
-     */
-    protected $sector_id_oid;
-
-    /**
-     *
      * @var integer
      */
     protected $tipo;
@@ -87,17 +63,6 @@ class Nota extends \Phalcon\Mvc\Model
      */
     protected $ultimodelanio;
 
-    /**
-     *
-     * @var string
-     */
-    protected $version;
-
-    /**
-     *
-     * @var string
-     */
-    protected $nro;
 
     /**
      *
@@ -560,9 +525,7 @@ class Nota extends \Phalcon\Mvc\Model
     public function initialize()
     {
         $this->belongsTo('nota_sectorOrigenId', 'Sectores', 'sector_id', array('alias' => 'Sectores'));
-        $this->belongsTo('sector_id_oid', 'Sector', 'id', array('alias' => 'Sector'));
         $this->setSchema('libro');
-
     }
 
     /**
