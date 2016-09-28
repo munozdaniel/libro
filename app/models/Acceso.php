@@ -97,6 +97,8 @@ class Acceso extends \Phalcon\Mvc\Model
     {
         $this->belongsTo('pagina_id', 'Pagina', 'pagina_id', array('alias' => 'Pagina'));
         $this->belongsTo('rol_id', 'Rol', 'rol_id', array('alias' => 'Rol'));
+        $this->setSchema('libro_phalcon');
+
     }
 
     /**

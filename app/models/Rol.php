@@ -95,6 +95,7 @@ class Rol extends \Phalcon\Mvc\Model
      */
     public function initialize()
     {
+        $this->setSchema('libro_phalcon');
         $this->hasMany('rol_id', 'Acceso', 'rol_id', array('alias' => 'Acceso'));
         $this->hasMany('rol_id', 'Usuarioporrol', 'rol_id', array('alias' => 'Usuarioporrol'));
     }

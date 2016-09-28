@@ -66,6 +66,7 @@ class Usuarioporrol extends \Phalcon\Mvc\Model
      */
     public function initialize()
     {
+        $this->setSchema('libro_phalcon');
         $this->belongsTo('rol_id', 'Rol', 'rol_id', array('alias' => 'Rol'));
         $this->belongsTo('usuario_id', 'Usuarios', 'usuario_id', array('alias' => 'Usuarios'));
     }

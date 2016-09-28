@@ -95,6 +95,7 @@ class Pagina extends \Phalcon\Mvc\Model
      */
     public function initialize()
     {
+        $this->setSchema('libro_phalcon');
         $this->hasMany('pagina_id', 'Acceso', 'pagina_id', array('alias' => 'Acceso'));
     }
 

@@ -443,7 +443,7 @@ class Expediente extends \Phalcon\Mvc\Model
     public function initialize()
     {
         $this->belongsTo('sector_id_oid', 'Sectores', 'sector_id', array('alias' => 'Sectores'));
-        $this->setSchema('libro');
+        $this->setSchema('libro_phalcon');
     }
     /**
      * Returns table name mapped in the model.

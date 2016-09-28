@@ -559,9 +559,10 @@ class Memo extends \Phalcon\Mvc\Model
      */
     public function initialize()
     {
+        $this->setSchema('libro_phalcon');
         $this->belongsTo('destinosector_id_oid', 'Sectores', 'sector_id', array('alias' => 'SectorDestino'));
         $this->belongsTo('sector_id_oid', 'Sectores', 'sector_id', array('alias' => 'SectorOrigen'));
-        $this->setSchema('libro');
+
     }
 
     /**
