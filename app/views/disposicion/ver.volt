@@ -15,7 +15,11 @@
 
     <div class="input-group ">
         <div class="input-group-btn">
-            {{ link_to(disposicion.getDisposicionAdjunto(),'Abrir ','class':'btn btn-danger btn-flat','target':'_blank') }}
+            {% if disposicion.getDisposicionAdjunto() != null %}
+                {{ link_to(disposicion.getDisposicionAdjunto(),'Abrir ','class':'btn btn-danger btn-flat','target':'_blank') }}
+            {% else %}
+                <a class="btn btn-danger btn-flat" target="_blank"><i class="fa fa-remove"></i></a>
+            {% endif %}
         </div>
         <!-- /btn-group -->
         {{ text_field('disposicion_adjunto','value':disposicion.getDisposicionAdjunto(),'class':'form-control','readOnly':'','placeholder':'SIN ADJUNTO') }}

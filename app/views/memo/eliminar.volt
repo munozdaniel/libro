@@ -29,7 +29,7 @@
                         {{ end_form() }}
                     </div>
                     <div class="modal-footer">
-                        {{ link_to('memo/listar','Cerrar','class':'btn btn-outline pull-left') }}
+                        {{ link_to('memo/listarData','Cerrar','class':'btn btn-outline pull-left') }}
                         {{ submit_button('Eliminar','class':'btn btn-outline','form':'eliminar') }}
                     </div>
                 </div>

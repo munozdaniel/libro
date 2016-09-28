@@ -26,6 +26,9 @@
                         {{ form.label('fecha',['class': 'col-sm-2 control-label']) }}
                         <div class="col-sm-4">
                             {{ form.render('fecha',['class': 'form-control']) }}
+                            <script>
+                                $('#fecha').prop("readOnly", false); // Quitamos el solo lectura.
+                            </script>
                         </div>
                     </div>
                     <div class="form-group">

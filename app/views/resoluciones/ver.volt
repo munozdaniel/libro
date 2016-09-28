@@ -19,7 +19,11 @@
 
         <div class="input-group ">
             <div class="input-group-btn">
-                {{ link_to(resolucion.getResolucionesAdjunto(),'Abrir ','class':'btn btn-danger btn-flat','target':'_blank') }}
+                {% if resolucion.getResolucionesAdjunto() != null %}
+                    {{ link_to(resolucion.getResolucionesAdjunto(),'Abrir ','class':'btn btn-danger btn-flat','target':'_blank') }}
+                {% else %}
+                    <a class="btn btn-danger btn-flat" target="_blank"><i class="fa fa-remove"></i></a>
+                {% endif %}
             </div>
             <!-- /btn-group -->
             {{ text_field('resolucion_adjunto','value':resolucion.getResolucionesAdjunto(),'class':'form-control','readOnly':'','placeholder':'SIN ADJUNTO') }}

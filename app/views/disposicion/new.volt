@@ -32,7 +32,7 @@
         <form class="form-horizontal">
             <div class="box-body">
                 <div class="form-group">
-                    {{ link_to('disposicion/listar','<i class="fa fa-remove"></i> Cancelar','class':'btn btn-flat btn-block btn-social btn-tumblr') }}
+                    {{ link_to('disposicion/listarData','<i class="fa fa-remove"></i> Cancelar','class':'btn btn-flat btn-block btn-social btn-tumblr') }}
                 </div>
                 <div class="form-group">
                     <button type="submit" form="nuevo" class="btn btn-flat btn-block btn-social btn-twitter">

@@ -15,7 +15,11 @@
 
     <div class="input-group ">
         <div class="input-group-btn">
-            {{ link_to(nota.getNotaAdjunto(),'Abrir ','class':'btn btn-danger btn-flat','target':'_blank') }}
+            {% if nota.getNotaAdjunto() != null %}
+                {{ link_to(nota.getNotaAdjunto(),'Abrir ','class':'btn btn-danger btn-flat','target':'_blank') }}
+            {% else %}
+                <a class="btn btn-danger btn-flat" target="_blank"><i class="fa fa-remove"></i></a>
+            {% endif %}
         </div>
         <!-- /btn-group -->
         {{ text_field('nota_adjunto','value':nota.getNotaAdjunto(),'class':'form-control','readOnly':'','placeholder':'SIN ADJUNTO') }}

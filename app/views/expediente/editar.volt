@@ -43,7 +43,7 @@
         <form class="form-horizontal">
             <div class="box-body">
                 {{ submit_button('Guardar Cambios','class':' ','form':'editar') }}
-                {{ link_to('expediente/listar','<i class="fa fa-remove"></i> Cancelar Cambios','class':'pull-right') }}
+                {{ link_to('expediente/listarData','<i class="fa fa-remove"></i> Cancelar Cambios','class':'pull-right') }}
             </div>
         </form>
     </div>

@@ -15,7 +15,11 @@
 
     <div class="input-group ">
         <div class="input-group-btn">
-            {{ link_to(expediente.getExpedienteAdjunto(),'Abrir ','class':'btn btn-danger btn-flat','target':'_blank') }}
+            {% if expediente.getExpedienteAdjunto() != null %}
+                {{ link_to(expediente.getExpedienteAdjunto(),'Abrir ','class':'btn btn-danger btn-flat','target':'_blank') }}
+            {% else %}
+                <a class="btn btn-danger btn-flat" target="_blank"><i class="fa fa-remove"></i></a>
+            {% endif %}
         </div>
         <!-- /btn-group -->
         {{ text_field('expediente_adjunto','value':expediente.getExpedienteAdjunto(),'class':'form-control','readOnly':'','placeholder':'SIN ADJUNTO') }}
