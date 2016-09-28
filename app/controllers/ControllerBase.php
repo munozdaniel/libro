@@ -8,6 +8,7 @@ class ControllerBase extends Controller
     {
         $this->tag->prependTitle('LIBRO | ');
         $this->view->setTemplateAfter('main');
+        $this->importarFechaFirefox();
     }
     protected function redireccionar($uri)
     {
@@ -24,10 +25,10 @@ class ControllerBase extends Controller
     protected function importarFechaFirefox()
     {
 
-        $this->assets->collection('footer')
+        $this->assets->collection('footerJs')
             ->addJs('http://cdn.jsdelivr.net/webshim/1.12.4/extras/modernizr-custom.js', false)
             ->addJs('http://cdn.jsdelivr.net/webshim/1.12.4/polyfiller.js', false);
-        $this->assets->collection('footerInline')
+        $this->assets->collection('footerInlineJs')
             ->addInlineJs("webshims.setOptions('waitReady', false);
                             webshims.setOptions('forms-ext', {types: 'date'});
                             webshims.polyfill('forms forms-ext');");
