@@ -6,33 +6,34 @@
 <style>
 
 </style>
-<body>
+<body style="border: 4px solid #000000;">
 {{ content() }}
 <div align="center">
     {{ image('img/caratula/header.jpg','alt':'Header ') }}
 </div>
-<h2>
-    <strong>Documento:</strong> NOTA ( Número: {% if nro_nota is defined %}  {{ nro_nota }} {% endif %})
-</h2>
+<p style="font-size: 18px; margin: 80px 0 20px 60px;">
+    Documento: <strong>NOTA ( Número: {% if nro is defined %}  {{ nro }} {% endif %})</strong>
+</p>
 
-<h2>
-    <strong>Fecha de Ingreso:</strong>{% if  fecha is defined %}  {{ fecha }}{% endif %}
-</h2>
+<p style="font-size: 18px; margin: 80px 0 20px 60px;">
+    Fecha de Ingreso:<strong>{% if  fecha is defined %}  {{ fecha }}{% endif %}</strong>
+</p>
 
-<h2>
-    <strong>De:</strong> {% if origen is defined %}  {{ origen }} {% endif %}
-</h2>
+<p style="font-size: 18px; margin: 40px 0 20px 60px;">
+    De:<strong> {% if origen is defined %}  {{ origen }} {% endif %}</strong>
+</p>
 
-<h2>
-    <strong>Motivo:</strong>{% if  descripcion is defined %} {{ descripcion }} {% endif %}
-</h2>
+<p style="font-size: 18px; margin: 40px 0 20px 60px;">
+    Motivo:<strong>{% if  descripcion is defined %} {{ descripcion }} {% endif %}</strong>
+</p>
 
-<h2>
-    <strong>Destino:</strong>{% if  destino is defined %} {{ destino }} {% endif %}
-</h2>
-<footer style="vertical-align: bottom; margin-top:40%; text-align: center">
-    <p><em>Ante cualquier consulta, Ud. puede comunicarse al I.M.P.S. al teléfono <strong> 0299 4433978 int
-                25.</strong></em></p>
+<p style="font-size: 18px; margin: 40px 0 20px 60px;">
+    Destino:<strong> {% if destino is defined %}  {{ destino }} {% endif %}</strong>
+</p>
+<footer style="vertical-align: bottom; bottom: 40px; position: absolute; right: 20px;">
+    <p><em>Instituto Municipal de Previsión Social</em></p>
+
+    <p><em>Bouquet Roldán 355 - Neuquén Capital</em></p>
 </footer>
 </body>
 </html>

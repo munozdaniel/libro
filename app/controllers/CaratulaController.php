@@ -25,7 +25,7 @@ class CaratulaController  extends ControllerBase
 
         // Get the view data
         $html = $this->view->getRender('caratula', 'nota', array(
-            'nro_nota' => $nota->getNroNota(),
+            'nro' => $nota->getNroNota(),
             'fecha' =>  date('d/m/Y', strtotime($nota->getFecha())),
             'origen' => $nota->getSectores()->getSectorNombre(),
             'descripcion' => $nota->getDescripcion(),
@@ -57,7 +57,7 @@ class CaratulaController  extends ControllerBase
         else
             $destino = $memo->getSectorDestino()->getSectorNombre();
         $html = $this->view->getRender('caratula', 'memo', array(
-            'nro_memo' => $memo->getNroMemo(),
+            'nro' => $memo->getNroMemo(),
             'fecha' =>  date('d/m/Y', strtotime($memo->getFecha())),
             'origen' => $memo->getSectorOrigen()->getSectorNombre(),
             'descripcion' => $memo->getDescripcion(),
