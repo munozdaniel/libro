@@ -8,7 +8,6 @@ class NotaController extends ControllerBase
     public function initialize()
     {
         $this->tag->setTitle('Notas');
-        $this->importarFechaFirefox();
         parent::initialize();
     }
     /**
@@ -80,7 +79,7 @@ class NotaController extends ControllerBase
     public function createAction()
     {
         if (!$this->request->isPost()) {
-            return $this->redireccionar("nota/listar");
+            return $this->redireccionar("nota/listarData");
         }
         $this->db->begin();
 
@@ -145,7 +144,7 @@ class NotaController extends ControllerBase
         $form->clear();
         $this->db->commit();
         $this->flashSession->success("La Nota ha sido creada correctamente");
-        return $this->response->redirect('nota/listar');
+        return $this->response->redirect('nota/listarData');
     }
 
     /**
@@ -156,7 +155,7 @@ class NotaController extends ControllerBase
     {
 
         if (!$this->request->isPost()) {
-            return $this->redireccionar("nota/listar");
+            return $this->redireccionar("nota/listarData");
         }
 
         $id = $this->request->getPost("id_documento", "int");
@@ -164,7 +163,7 @@ class NotaController extends ControllerBase
         $nota = Nota::findFirst("id_documento=" . $id);
         if (!$nota) {
             $this->flash->error("La nota no pudo ser editada.");
-            return $this->redireccionar("nota/listar");
+            return $this->redireccionar("nota/listarData");
         }
         $this->db->begin();
 
@@ -207,7 +206,7 @@ class NotaController extends ControllerBase
 
         $this->db->commit();
         $this->flashSession->success("La Nota ha sido actualizada correctamente");
-        return $this->response->redirect('nota/listar');
+        return $this->response->redirect('nota/listarData');
     }
 
 
@@ -239,11 +238,11 @@ class NotaController extends ControllerBase
         $nota = Nota::findFirst('id_documento=' . $id_documento);
         if (!$nota) {
             $this->flashSession->error("La nota no se encontró");
-            return $this->response->redirect("nota/listar");
+            return $this->response->redirect("nota/listarData");
         }
         if ($nota->getHabilitado() == 0) {
             $this->flashSession->warning("La nota ya fue eliminada");
-            return $this->response->redirect("nota/listar");
+            return $this->response->redirect("nota/listarData");
         }
         $this->view->id_documento = $id_documento;
     }
@@ -264,7 +263,7 @@ class NotaController extends ControllerBase
             $nota = Nota::findFirst('id_documento=' . $id_documento);
             if (!$nota) {
                 $this->flashSession->warning("La nota no se encontró");
-                return $this->response->redirect("nota/listar");
+                return $this->response->redirect("nota/listarData");
             }
             $this->db->begin();
             if ($nota->getUltimo() == 1) {
@@ -324,7 +323,7 @@ class NotaController extends ControllerBase
                 $this->flashSession->success('La nota ' . $nota->getNroNota() . ' ha sido deshabilitada');
             }
         }
-        return $this->response->redirect("nota/listar");
+        return $this->response->redirect("nota/listarData");
     }
 
     /* ====================================================

@@ -59,7 +59,7 @@ class DisposicionController extends ControllerBase
     {
 
         if (!$this->request->isPost()) {
-            return $this->redireccionar("disposicion/listar");
+            return $this->redireccionar("disposicion/listarData");
         }
         $this->db->begin();
 
@@ -123,7 +123,7 @@ class DisposicionController extends ControllerBase
         $form->clear();
         $this->db->commit();
         $this->flashSession->success("La Disposicion ha sido creada correctamente");
-        return $this->response->redirect('disposicion/listar');
+        return $this->response->redirect('disposicion/listarData');
 
     }
 
@@ -159,7 +159,7 @@ class DisposicionController extends ControllerBase
     {
 
         if (!$this->request->isPost()) {
-            return $this->redireccionar("disposicion/listar");
+            return $this->redireccionar("disposicion/listarData");
         }
 
         $id = $this->request->getPost("id_documento", "int");
@@ -209,7 +209,7 @@ class DisposicionController extends ControllerBase
 
         $this->db->commit();
         $this->flashSession->success("La Disposicion ha sido actualizada correctamente");
-        return $this->response->redirect('disposicion/listar');
+        return $this->response->redirect('disposicion/listarData');
 
     }
 
@@ -263,7 +263,7 @@ class DisposicionController extends ControllerBase
         $documento = Disposicion::findFirst(array('id_documento=' . $id_documento));
         if (!$documento) {
             $this->flash->error("La disposicion no se encontró");
-            return $this->redireccionar("disposicion/listar");
+            return $this->redireccionar("disposicion/listarData");
         }
         $this->view->disposicion = $documento;
         $this->view->form = new DisposicionForm($documento, array('edit' => true, 'readOnly' => true, 'required' => true));
@@ -280,11 +280,11 @@ class DisposicionController extends ControllerBase
         $documento = Disposicion::findFirst('id_documento=' . $id_documento);
         if (!$documento) {
             $this->flashSession->error("La disposicion no se encontró");
-            return $this->response->redirect("disposicion/listar");
+            return $this->response->redirect("disposicion/listarData");
         }
         if ($documento->getHabilitado() == 0) {
             $this->flashSession->warning("La disposicion ya fue eliminada");
-            return $this->response->redirect("disposicion/listar");
+            return $this->response->redirect("disposicion/listarData");
         }
         $this->view->id_documento = $id_documento;
     }
@@ -305,7 +305,7 @@ class DisposicionController extends ControllerBase
             $documento = Disposicion::findFirst('id_documento=' . $id_documento);
             if (!$documento) {
                 $this->flashSession->warning("La Disposicion no se encontró");
-                return $this->response->redirect("disposicion/listar");
+                return $this->response->redirect("disposicion/listarData");
             }
             $this->db->begin();
             if ($documento->getUltimo() == 1) {
@@ -365,7 +365,7 @@ class DisposicionController extends ControllerBase
                 $this->flashSession->success('La disposicion ' . $documento->getNroDisposicion() . ' ha sido deshabilitada');
             }
         }
-        return $this->response->redirect("disposicion/listar");
+        return $this->response->redirect("disposicion/listarData");
     }
 
     /* ====================================================

@@ -128,7 +128,7 @@ class ExpedienteController extends ControllerBase
         $form->clear();
         $this->db->commit();
         $this->flashSession->success("El Expediente ha sido creada correctamente");
-        return $this->response->redirect('expediente/listar');
+        return $this->response->redirect('expediente/listarData');
 
     }
     /**
@@ -172,7 +172,7 @@ class ExpedienteController extends ControllerBase
         $documento = Expediente::findFirst("id_documento=" . $id);
         if (!$documento) {
             $this->flash->error("El expediente no pudo ser editada.");
-            return $this->redireccionar("expediente/listar");
+            return $this->redireccionar("expediente/listarData");
         }
         $this->db->begin();
 
@@ -218,7 +218,7 @@ class ExpedienteController extends ControllerBase
 
         $this->db->commit();
         $this->flashSession->success("El Expediente ha sido actualizada correctamente");
-        return $this->response->redirect('expediente/listar');
+        return $this->response->redirect('expediente/listarData');
 
     }
 
@@ -274,7 +274,7 @@ class ExpedienteController extends ControllerBase
         $documento = Expediente::findFirst(array('id_documento=' . $id_documento));
         if (!$documento) {
             $this->flash->error("El expediente no se encontró");
-            return $this->redireccionar("expediente/listar");
+            return $this->redireccionar("expediente/listarData");
         }
         $this->view->expediente = $documento;
         $this->view->form = new ExpedienteForm($documento, array('edit' => true, 'readOnly' => true, 'required' => true));
@@ -294,7 +294,7 @@ class ExpedienteController extends ControllerBase
         }
         if ($documento->getHabilitado() == 0) {
             $this->flashSession->warning("La expediente ya fue eliminada");
-            return $this->response->redirect("expediente/listar");
+            return $this->response->redirect("expediente/listarData");
         }
         $this->view->id_documento = $id_documento;
     }
@@ -315,7 +315,7 @@ class ExpedienteController extends ControllerBase
             $documento = Expediente::findFirst('id_documento=' . $id_documento);
             if (!$documento) {
                 $this->flashSession->warning("La Expediente no se encontró");
-                return $this->response->redirect("expediente/listar");
+                return $this->response->redirect("expediente/listarData");
             }
             $this->db->begin();
             if ($documento->getUltimo() == 1) {
@@ -375,7 +375,7 @@ class ExpedienteController extends ControllerBase
                 $this->flashSession->success('El Expediente ' . $documento->getNroExpediente() . ' ha sido deshabilitada');
             }
         }
-        return $this->response->redirect("expediente/listar");
+        return $this->response->redirect("expediente/listarData");
     }
 
     /* ====================================================

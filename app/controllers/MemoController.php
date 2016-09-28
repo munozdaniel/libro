@@ -89,7 +89,7 @@ class MemoController extends ControllerBase
     {
 
         if (!$this->request->isPost()) {
-            return $this->redireccionar("memo/listar");
+            return $this->redireccionar("memo/listarData");
         }
         $this->db->begin();
         $form = new MemoForm;
@@ -159,7 +159,7 @@ class MemoController extends ControllerBase
             $form->clear();
             $this->db->commit();
             $this->flashSession->success("El Memo ha sido creado correctamente");
-            return $this->response->redirect('memo/listar');
+            return $this->response->redirect('memo/listarData');
         }
     }
 
@@ -171,7 +171,7 @@ class MemoController extends ControllerBase
     {
 
         if (!$this->request->isPost()) {
-            return $this->redireccionar("memo/listar");
+            return $this->redireccionar("memo/listarData");
         }
 
         $id = $this->request->getPost("id_documento", "int");
@@ -179,7 +179,7 @@ class MemoController extends ControllerBase
         $memo = Memo::findFirst("id_documento=" . $id);
         if (!$memo) {
             $this->flash->error("El memo no pudo ser editado.");
-            return $this->redireccionar("memo/listar");
+            return $this->redireccionar("memo/listarData");
 
         }
         $this->db->begin();
@@ -223,7 +223,7 @@ class MemoController extends ControllerBase
 
         $this->db->commit();
         $this->flashSession->success("El Memo ha sido actualizado correctamente");
-        return $this->response->redirect('memo/listar');
+        return $this->response->redirect('memo/listarData');
 
     }
 
@@ -300,7 +300,7 @@ class MemoController extends ControllerBase
         }
         if ($memo->getHabilitado() == 0) {
             $this->flashSession->warning("El memo ya fue eliminado");
-            return $this->response->redirect("memo/listar");
+            return $this->response->redirect("memo/listarData");
         }
         $this->view->id_documento = $id_documento;
     }
@@ -381,7 +381,7 @@ class MemoController extends ControllerBase
                 $this->flashSession->success('El memo ' . $memo->getNroMemo() . ' ha sido deshabilitado');
             }
         }
-        return $this->response->redirect("memo/listar");
+        return $this->response->redirect("memo/listarData");
     }
 
     /* ====================================================

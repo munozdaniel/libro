@@ -126,7 +126,7 @@ class ResolucionesController extends ControllerBase
         $form->clear();
         $this->db->commit();
         $this->flashSession->success("La Resolucion ha sido creada correctamente");
-        return $this->response->redirect('resoluciones/listar');
+        return $this->response->redirect('resoluciones/listarData');
     }
     /**
      * Edits a resolucione
@@ -160,7 +160,7 @@ class ResolucionesController extends ControllerBase
     {
 
         if (!$this->request->isPost()) {
-            return $this->redireccionar("resoluciones/listar");
+            return $this->redireccionar("resoluciones/listarData");
         }
 
         $id = $this->request->getPost("id_documento", "int");
@@ -168,7 +168,7 @@ class ResolucionesController extends ControllerBase
         $documento = Resoluciones::findFirst("id_documento=" . $id);
         if (!$documento) {
             $this->flash->error("La resolucion no pudo ser editada.");
-            return $this->redireccionar("resoluciones/listar");
+            return $this->redireccionar("resoluciones/listarData");
         }
         $this->db->begin();
 
@@ -210,7 +210,7 @@ class ResolucionesController extends ControllerBase
 
         $this->db->commit();
         $this->flashSession->success("La Resolucion ha sido actualizada correctamente");
-        return $this->response->redirect('resoluciones/listar');
+        return $this->response->redirect('resoluciones/listarData');
 
     }
 
@@ -242,11 +242,11 @@ class ResolucionesController extends ControllerBase
         $documento = Resoluciones::findFirst('id_documento=' . $id_documento);
         if (!$documento) {
             $this->flashSession->error("La resoluciones no se encontró");
-            return $this->response->redirect("resoluciones/listar");
+            return $this->response->redirect("resoluciones/listarData");
         }
         if ($documento->getHabilitado() == 0) {
             $this->flashSession->warning("La resoluciones ya fue eliminada");
-            return $this->response->redirect("resoluciones/listar");
+            return $this->response->redirect("resoluciones/listarData");
         }
         $this->view->id_documento = $id_documento;
     }
@@ -267,7 +267,7 @@ class ResolucionesController extends ControllerBase
             $documento = Resoluciones::findFirst('id_documento=' . $id_documento);
             if (!$documento) {
                 $this->flashSession->warning("La Resolucion no se encontró");
-                return $this->response->redirect("resoluciones/listar");
+                return $this->response->redirect("resoluciones/listarData");
             }
             $this->db->begin();
             if ($documento->getUltimo() == 1) {
@@ -327,7 +327,7 @@ class ResolucionesController extends ControllerBase
                 $this->flashSession->success('La resolucion ' . $documento->getNroResolucion() . ' ha sido deshabilitada');
             }
         }
-        return $this->response->redirect("resoluciones/listar");
+        return $this->response->redirect("resoluciones/listarData");
     }
 
     /* ====================================================
