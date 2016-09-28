@@ -5,7 +5,12 @@ use Phalcon\Paginator\Adapter\Model as Paginator;
 
 class ExpedienteController extends ControllerBase
 {
-
+    public function initialize()
+    {
+        $this->tag->setTitle('Expediente');
+        $this->importarFechaFirefox();
+        parent::initialize();
+    }
     /**
      * Index action
      */

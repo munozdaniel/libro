@@ -5,7 +5,12 @@ use Phalcon\Paginator\Adapter\Model as Paginator;
 
 class NotaController extends ControllerBase
 {
-
+    public function initialize()
+    {
+        $this->tag->setTitle('Notas');
+        $this->importarFechaFirefox();
+        parent::initialize();
+    }
     /**
      * Formulario para hacer busquedas
      */
@@ -520,14 +525,14 @@ class NotaController extends ControllerBase
         $from = array('N' => 'Nota','S'=>'Sectores');
         if( $this->session->get('auth')['rol_id']==2)//Administrador
         {
-            $where = 'S.sector_id=N.sector_id_oid ';
+            $where = 'S.sector_id=N.nota_sectorOrigenId ';
         }
         else
         {
             $ultimo_anio= date('Y');
             $desde = $ultimo_anio."-01-01";
             $hasta = date('Y-m-d');
-            $where = "S.sector_id=N.sector_id_oid AND N.habilitado=1 AND (fecha BETWEEN '$desde' AND '$hasta')";
+            $where = "S.sector_id=N.nota_sectorOrigenId AND N.habilitado=1 AND (fecha BETWEEN '$desde' AND '$hasta')";
         }
         $order_default = "id_documento DESC";
         $columnas_dt = array(

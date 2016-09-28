@@ -5,7 +5,12 @@ use Phalcon\Paginator\Adapter\Model as Paginator;
 
 class ResolucionesController extends ControllerBase
 {
-
+    public function initialize()
+    {
+        $this->tag->setTitle('Resolucion');
+        $this->importarFechaFirefox();
+        parent::initialize();
+    }
     /**
      * Index action
      */

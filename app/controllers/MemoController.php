@@ -5,7 +5,12 @@ use Phalcon\Paginator\Adapter\Model as Paginator;
 
 class MemoController extends ControllerBase
 {
-
+    public function initialize()
+    {
+        $this->tag->setTitle('Memo');
+        $this->importarFechaFirefox();
+        parent::initialize();
+    }
     /**
      * Index action
      */

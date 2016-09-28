@@ -5,7 +5,12 @@ use Phalcon\Paginator\Adapter\Model as Paginator;
 
 class DisposicionController extends ControllerBase
 {
-
+    public function initialize()
+    {
+        $this->tag->setTitle('Disposicion');
+        $this->importarFechaFirefox();
+        parent::initialize();
+    }
     /**
      * Index action
      */
