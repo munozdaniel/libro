@@ -10,13 +10,13 @@ class NotaController extends ControllerBase
         $this->tag->setTitle('Notas');
         parent::initialize();
     }
+
     /**
      * Formulario para hacer busquedas
      */
     public function indexAction()
     {
         $this->persistent->parameters = null;
-
         $this->assets->collection('headerCss')
             ->addCss('plugins/select2/select2.min.css');
         $this->assets->collection('footerJs')
@@ -127,8 +127,7 @@ class NotaController extends ControllerBase
             $path = $this->guardarAdjunto($archivos, $nombreCarpeta);
             if ($path == "") {
                 $this->flashSession->error("Edite la nota para volver a adjuntar el archivo.");
-            }
-            else{
+            } else {
                 $nota->setNotaAdjunto($path);
             }
         }
@@ -358,10 +357,36 @@ class NotaController extends ControllerBase
      */
     public function searchAction()
     {
+
+
         $this->setDatatables();
         $numberPage = 1;
         if ($this->request->isPost()) {
+            $_POST['descripcion'] = strtoupper($_POST['descripcion']);
+            $_POST['destino'] = strtoupper($_POST['destino']);
+            if ($this->request->getPost('nro_nota_final', 'int') == null) {
+                $_POST['nro_nota']=$this->request->getPost('nro_nota_inicial', 'int');
+            }
+            if ($this->request->getPost('fecha_final') == null) {
+                $_POST['fecha']=$this->request->getPost('fecha_inicial');
+            }
             $query = Criteria::fromInput($this->di, "Nota", $_POST);
+            if ($this->request->getPost('nro_nota_final', 'int') != null
+                && $this->request->getPost('nro_nota_inicial', 'int') != null) {
+                $query->andWhere('nro_nota BETWEEN '. $this->request->getPost('nro_nota_inicial', 'int') ." AND ". $this->request->getPost('nro_nota_final', 'int'));
+            }
+            if ($this->request->getPost('fecha_final') != null) {
+                if($this->request->getPost('fecha_inicial') != null) {
+                    $query->betweenWhere('fecha', $this->request->getPost('fecha_inicial'), $this->request->getPost('fecha_final'));
+                }
+                else
+                {
+                    $this->flashSession->error("Verifique que la fecha inicial y final estén correctamente ingresadas");
+                    return $this->response->redirect('nota/index');
+                }
+            }
+
+            //var_dump($query->getParams());
             $this->persistent->parameters = $query->getParams();
         } else {
             $numberPage = $this->request->getQuery("page", "int");
@@ -401,110 +426,117 @@ class NotaController extends ControllerBase
 
         $this->view->page = $paginator->getPaginate();
     }
+    /*
+        public function searchEntreFechasAction()
+        {
+            $this->setDatatables();
+            $this->view->pick('nota/search');
+            $numberPage = 1;
 
-    public function searchEntreFechasAction()
-    {
-        $this->setDatatables();
-        $this->view->pick('nota/search');
-        $numberPage = 1;
+            $rol = $this->session->get('auth')['rol_nombre'];
+            $limitarAnio = "";
+            if ($rol != "ADMINISTRADOR") {
+                $date = date_create(date('Y') . '-01-01');
+                $ultimoAno = date_format($date, "Y-m-d");//A pedido. los usuarios normales solo podrán ver las notas del ultimo año.
+                $limitarAnio = "  '$ultimoAno'  <= fecha AND ";
+            }
+            $desde = $this->request->getPost('fecha_desde');
+            $hasta = $this->request->getPost('fecha_hasta');
+            if ($this->request->isPost()) {
 
-        $rol = $this->session->get('auth')['rol_nombre'];
-        $limitarAnio = "";
-        if ($rol != "ADMINISTRADOR") {
-            $date = date_create(date('Y') . '-01-01');
-            $ultimoAno = date_format($date, "Y-m-d");//A pedido. los usuarios normales solo podrán ver las notas del ultimo año.
-            $limitarAnio = "  '$ultimoAno'  <= fecha AND ";
+                $query = Criteria::fromInput($this->di, "Nota", $_POST);
+                $this->persistent->parameters = $query->getParams();
+            } else {
+                $numberPage = $this->request->getQuery("page", "int");
+            }
+
+            $parameters = $this->persistent->parameters;
+            if (!is_array($parameters)) {
+                $parameters = array();
+            }
+            $parameters["order"] = "id_documento DESC";
+            if ($desde != null && $hasta != null) {
+                if (isset($parameters['conditions']))
+                    $parameters['conditions'] .= " AND $limitarAnio  fecha BETWEEN '$desde' AND '$hasta'";
+                else
+                    $parameters['conditions'] = "$limitarAnio  fecha BETWEEN '$desde' AND '$hasta'";
+            }
+            $nota = Nota::find($parameters);
+            if (count($nota) == 0) {
+                $this->flashSession->warning("<i class='fa fa-warning'></i> No se encontraron notas cargadas en el sistema que coincidan con su búsqueda");
+                return $this->response->redirect('nota/index');
+            }
+
+            $paginator = new Paginator(array(
+                "data" => $nota,
+                "limit" => 10,
+                "page" => $numberPage
+            ));
+
+            $this->view->page = $paginator->getPaginate();
         }
-        $desde = $this->request->getPost('fecha_desde');
-        $hasta = $this->request->getPost('fecha_hasta');
-        if ($this->request->isPost()) {
-
-            $query = Criteria::fromInput($this->di, "Nota", $_POST);
-            $this->persistent->parameters = $query->getParams();
-        } else {
-            $numberPage = $this->request->getQuery("page", "int");
-        }
-
-        $parameters = $this->persistent->parameters;
-        if (!is_array($parameters)) {
-            $parameters = array();
-        }
-        $parameters["order"] = "id_documento DESC";
-        if ($desde != null && $hasta != null) {
-            if (isset($parameters['conditions']))
-                $parameters['conditions'] .= " AND $limitarAnio  fecha BETWEEN '$desde' AND '$hasta'";
-            else
-                $parameters['conditions'] = "$limitarAnio  fecha BETWEEN '$desde' AND '$hasta'";
-        }
-        $nota = Nota::find($parameters);
-        if (count($nota) == 0) {
-            $this->flashSession->warning("<i class='fa fa-warning'></i> No se encontraron notas cargadas en el sistema que coincidan con su búsqueda");
-            return $this->response->redirect('nota/index');
-        }
-
-        $paginator = new Paginator(array(
-            "data" => $nota,
-            "limit" => 10,
-            "page" => $numberPage
-        ));
-
-        $this->view->page = $paginator->getPaginate();
-    }
-
-    /**
-     * Busqueda entre 2 nros
-     * @return \Phalcon\Http\Response|\Phalcon\Http\ResponseInterface
-     */
-    public function searchEntreNumerosAction()
-    {
-        $this->setDatatables();
-        $this->view->pick('nota/search');
-        $numberPage = 1;
-
-        $rol = $this->session->get('auth')['rol_nombre'];
-        $limitarAnio = "";
-        if ($rol != "ADMINISTRADOR") {
-            $date = date_create(date('Y') . '-01-01');
-            $ultimoAno = date_format($date, "Y-m-d");//A pedido. los usuarios normales solo podrán ver las notas del ultimo año.
-            $limitarAnio = " '$ultimoAno'  <= fecha AND ";
-        }
-        $desde = $this->request->getPost('nroInicial');
-        $hasta = $this->request->getPost('nroFinal');
-        if ($this->request->isPost()) {
-
-            $query = Criteria::fromInput($this->di, "Nota", $_POST);
-            $this->persistent->parameters = $query->getParams();
-        } else {
-            $numberPage = $this->request->getQuery("page", "int");
+        public function searchEntreNumerosIndexAction()
+        {
+            $this->persistent->parameters = null;
+            $this->assets->collection('headerCss')
+                ->addCss('plugins/select2/select2.min.css');
+            $this->assets->collection('footerJs')
+                ->addJs('plugins/select2/select2.full.min.js');
+            $this->assets->collection('footerInlineJs')
+                ->addInlineJs(' $(".autocompletar").select2();');
+            $this->view->form = new NotaForm(null, array('edit' => true));
         }
 
-        $parameters = $this->persistent->parameters;
-        if (!is_array($parameters)) {
-            $parameters = array();
+        public function searchEntreNumerosAction()
+        {
+            $this->setDatatables();
+
+
+            $rol = $this->session->get('auth')['rol_nombre'];
+            $limitarAnio = "";
+            if ($rol != "ADMINISTRADOR") {
+                $date = date_create(date('Y') . '-01-01');
+                $ultimoAno = date_format($date, "Y-m-d");//A pedido. los usuarios normales solo podrán ver las notas del ultimo año.
+                $limitarAnio = " '$ultimoAno'  <= fecha AND ";
+            }
+            $desde = $this->request->getPost('nroInicial');
+            $hasta = $this->request->getPost('nroFinal');
+
+            if ($this->request->isPost()) {
+                $numberPage = 1;
+                $query = Criteria::fromInput($this->di, "Nota", $_POST);
+                $this->persistent->parameters = $query->getParams();
+            } else {
+                $numberPage = $this->request->getQuery("page", "int");
+            }
+            $parameters = $this->persistent->parameters;
+            var_dump($_POST);
+            if (!is_array($parameters)) {
+                $parameters = array();
+            }
+            $parameters["order"] = "id_documento DESC";
+
+            if ($desde != null && $hasta != null) {
+                if (isset($parameters['conditions']))
+                    $parameters['conditions'] .= " AND $limitarAnio  nro_nota >= $desde AND nro_nota <= $hasta";
+                else
+                    $parameters['conditions'] = "$limitarAnio  nro_nota >= $desde AND nro_nota <= $hasta";
+            }
+            $nota = Nota::find($parameters);
+            if (count($nota) == 0) {
+                $this->flashSession->warning("<i class='fa fa-warning'></i> No se encontraron notas cargadas en el sistema que coincidan con su búsqueda");
+                return $this->response->redirect('nota/index');
+            }
+
+            $paginator = new Paginator(array(
+                "data" => $nota,
+                "limit" => 10,
+                "page" => $numberPage
+            ));
+
+            $this->view->page = $paginator->getPaginate();
         }
-        $parameters["order"] = "id_documento DESC";
-
-        if ($desde != null && $hasta != null) {
-            if (isset($parameters['conditions']))
-                $parameters['conditions'] .= " AND $limitarAnio  nro_nota >= $desde AND nro_nota <= $hasta";
-            else
-                $parameters['conditions'] = "$limitarAnio  nro_nota >= $desde AND nro_nota <= $hasta";
-        }
-        $nota = Nota::find($parameters);
-        if (count($nota) == 0) {
-            $this->flashSession->warning("<i class='fa fa-warning'></i> No se encontraron notas cargadas en el sistema que coincidan con su búsqueda");
-            return $this->response->redirect('nota/index');
-        }
-
-        $paginator = new Paginator(array(
-            "data" => $nota,
-            "limit" => 10,
-            "page" => $numberPage
-        ));
-
-        $this->view->page = $paginator->getPaginate();
-    }
-
+    */
     /**
      * Listar Las Notas
      */
@@ -520,39 +552,35 @@ class NotaController extends ControllerBase
     public function listarDataAjaxAction()
     {
         $this->view->disable();
-        $select = array('N.nro_nota','DATE_FORMAT( fecha,  \'%d/%m/%Y\' ) AS fecha','S.sector_nombre','N.destino','N.descripcion','N.habilitado','N.id_documento');
-        $from = array('N' => 'Nota','S'=>'Sectores');
-        if( $this->session->get('auth')['rol_id']==2)//Administrador
+        $select = array('N.nro_nota', 'DATE_FORMAT( fecha,  \'%d/%m/%Y\' ) AS fecha', 'S.sector_nombre', 'N.destino', 'N.descripcion', 'N.habilitado', 'N.id_documento');
+        $from = array('N' => 'Nota', 'S' => 'Sectores');
+        if ($this->session->get('auth')['rol_id'] == 2)//Administrador
         {
             $where = 'S.sector_id=N.nota_sectorOrigenId ';
-        }
-        else
-        {
-            $ultimo_anio= date('Y');
-            $desde = $ultimo_anio."-01-01";
+        } else {
+            $ultimo_anio = date('Y');
+            $desde = $ultimo_anio . "-01-01";
             $hasta = date('Y-m-d');
             $where = "S.sector_id=N.nota_sectorOrigenId AND N.habilitado=1 AND (fecha BETWEEN '$desde' AND '$hasta')";
         }
         $order_default = "id_documento DESC";
         $columnas_dt = array(
-            array('data'=>'nro_nota', 'db' => 'nro_nota', 'dt' => 0,
-                'formatter' => function( $d, $row ) {
-                    return '$'.number_format($d);
-                } ),
-            array('data'=>'fecha', 'db' => 'fecha',  'dt' => 1,
-                'formatter' => function( $d, $row ) {
-                    return date( 'd/M/Y', strtotime($d));
-                } ),
-            array('data'=>'sector_nombre', 'db' => 'sector_nombre',   'dt' => 2 ),
-            array('data'=>'destino', 'db' => 'destino',     'dt' => 3 ),
-            array('data'=>'descripcion', 'db' => 'descripcion',     'dt' => 4 )
+            array('data' => 'nro_nota', 'db' => 'nro_nota', 'dt' => 0,
+                'formatter' => function ($d, $row) {
+                    return '$' . number_format($d);
+                }),
+            array('data' => 'fecha', 'db' => 'fecha', 'dt' => 1,
+                'formatter' => function ($d, $row) {
+                    return date('d/M/Y', strtotime($d));
+                }),
+            array('data' => 'sector_nombre', 'db' => 'sector_nombre', 'dt' => 2),
+            array('data' => 'destino', 'db' => 'destino', 'dt' => 3),
+            array('data' => 'descripcion', 'db' => 'descripcion', 'dt' => 4)
         );
-        $retorno = ServerSide::simpleQuery($this->request,$this->modelsManager,$select,$from,$where,$order_default,$columnas_dt);
+        $retorno = ServerSide::simpleQuery($this->request, $this->modelsManager, $select, $from, $where, $order_default, $columnas_dt);
         echo json_encode($retorno);
         return;
     }
-
-
 
 
 }
