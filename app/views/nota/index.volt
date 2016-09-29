@@ -39,9 +39,6 @@
                         <label for="fecha" class="col-sm-2 control-label">Entre Fechas</label>
                         <div class="col-sm-4">
                             {{ date_field('fecha_inicial','class': 'form-control ') }}
-                            <script>
-                                $('#fecha').prop("readOnly", false); // Quitamos el solo lectura.
-                            </script>
                         </div>
                         <div class="col-sm-4">
                             {{ date_field('fecha_final','class': 'form-control ') }}
