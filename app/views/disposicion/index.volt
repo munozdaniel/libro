@@ -12,7 +12,7 @@
 
                     <div class="alert alert-info"><i class="fa fa-info-circle"></i> Ingrese únicamente los campos necesario. No son obligatorios</div>
                     <div class="form-group">
-                        <label for="nro_disposicion_inicial" class="col-sm-2 control-label">Nro Disposicion</label>
+                        <label for="nro_disposicion_inicial" class="col-sm-2 control-label">Entre Números</label>
 
                         <div class="col-sm-4">
                             {{ text_field('nro_disposicion_inicial','class': 'form-control','placeholder':'Nro de Disposicion Inicial') }}
@@ -23,7 +23,7 @@
                     </div>
 
                     <div class="form-group">
-                        {{ form.label('fecha',['class': 'col-sm-2 control-label']) }}
+                        <label for="fecha_inicial" class="col-sm-2 control-label">Entre Fechas</label>
                         <div class="col-sm-4">
                             {{ date_field('fecha_inicial','class': 'form-control ') }}
                         </div>
