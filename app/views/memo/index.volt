@@ -3,9 +3,6 @@
         <div class="nav-tabs-custom">
             <ul class="nav nav-tabs">
                 <li class="active"><a href="#busquedaGeneral" data-toggle="tab">Búsqueda General</a></li>
-                <li><a href="#porSectorYFecha" data-toggle="tab">Por Sector y Fechas </a></li>
-                <li><a href="#EntreFechas" data-toggle="tab">Entre Fechas</a></li>
-                <li><a href="#EntreNumeros" data-toggle="tab">Entre Números de Notas</a></li>
             </ul>
             <div class="tab-content">
                 <div class="active tab-pane" id="busquedaGeneral">
@@ -18,19 +15,32 @@
                     </div>
                     <div class="form-group">
                         <label for="nro_memo" class="col-sm-2 control-label">Nro Memo</label>
-
                         <div class="col-sm-4">
-                            {{ text_field('nro_memo','class': 'form-control','placeholder':'Ingrese el Nro de Memo') }}
+                            {{ text_field('nro_memo_inicial','class': 'form-control','placeholder':'Ingrese el Nro de Memo') }}
+                        </div>
+                        <div class="col-sm-4">
+                            {{ text_field('nro_memo_final','class': 'form-control','placeholder':'Ingrese el Nro de Memo') }}
+                            <script>
+                                $('#nro_memo_final').on('input', function () {
+                                    // Si se ingresa el numero de nota final entonces es obligatorio que se ingrese el numero de nota inicial
+                                    if ($(this).val()) {
+                                        $("#nro_memo_inicial").prop('required', true);
+                                    }
+                                    else {
+                                        $("#nro_memo_inicial").prop('required', false);
+                                    }
+                                });
+                            </script>
                         </div>
                     </div>
 
                     <div class="form-group">
                         {{ form.label('fecha',['class': 'col-sm-2 control-label']) }}
                         <div class="col-sm-4">
-                            {{ form.render('fecha',['class': 'form-control']) }}
-                            <script>
-                                $('#fecha').prop("readOnly", false); // Quitamos el solo lectura.
-                            </script>
+                            {{ date_field('fecha_inicial','class': 'form-control ') }}
+                        </div>
+                        <div class="col-sm-4">
+                            {{ date_field('fecha_final','class': 'form-control ') }}
                         </div>
                     </div>
                     <div class="form-group">
@@ -58,14 +68,11 @@
                                 }
                             </script>
                         </div>
-                    </div>
-                    <div id="otro" class="form-group ocultar" style="width: 100%">
-                        <label for="otrodestino" class="col-sm-2 control-label"><strong class="text-danger "> * </strong>Otro Destino</label>
 
-                        <div class="col-sm-4">
+                        <div id="otro" class="col-sm-4 ocultar">
 
                             <input type="text" id="otrodestino" name="otrodestino" list="otrodestino-list"
-                                   placeholder="Ingrese el nuevo sector" class="form-control">
+                                   placeholder="Ingrese el nuevo sector" class="form-control" style="background-color: #fce9c7;">
                             <datalist id="otrodestino-list"></datalist>
                             <script>
 
@@ -111,12 +118,11 @@
                                 request.open('GET', '/libro/sectores/cargarSectoresAjax', true);
                                 request.send();
                             </script>
-
-                        </div>
+                    </div>
                     </div>
                     <div class="form-group">
                         {{ form.label('descripcion',['class': 'col-sm-2 control-label']) }}
-                        <div class="col-sm-4">
+                        <div class="col-sm-8">
                             {{ form.render('descripcion',['class': 'form-control']) }}
                         </div>
                     </div>

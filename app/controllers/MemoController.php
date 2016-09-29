@@ -434,7 +434,31 @@ class MemoController extends ControllerBase
 
         $numberPage = 1;
         if ($this->request->isPost()) {
+            $_POST['descripcion'] = strtoupper($_POST['descripcion']);
+            $_POST['otrodestino'] = strtoupper($_POST['otrodestino']);
+            if ($this->request->getPost('nro_memo_final', 'int') == null) {
+                $_POST['nro_memo']=$this->request->getPost('nro_memo_inicial', 'int');
+            }
+            if ($this->request->getPost('fecha_final') == null) {
+                $_POST['fecha']=$this->request->getPost('fecha_inicial');
+            }
             $query = Criteria::fromInput($this->di, "Memo", $_POST);
+
+            if ($this->request->getPost('nro_memo_final', 'int') != null
+                && $this->request->getPost('nro_memo_inicial', 'int') != null) {
+                $query->andWhere('nro_memo BETWEEN '. $this->request->getPost('nro_memo_inicial', 'int') ." AND ". $this->request->getPost('nro_memo_final', 'int'));
+            }
+            if ($this->request->getPost('fecha_final') != null) {
+                if($this->request->getPost('fecha_inicial') != null) {
+                    $query->betweenWhere('fecha', $this->request->getPost('fecha_inicial'), $this->request->getPost('fecha_final'));
+                }
+                else
+                {
+                    $this->flashSession->error("Verifique que la fecha inicial y final estén correctamente ingresadas");
+                    return $this->response->redirect('memo/index');
+                }
+            }
+            //var_dump($query->getParams());
             $this->persistent->parameters = $query->getParams();
         } else {
             $numberPage = $this->request->getQuery("page", "int");
@@ -461,106 +485,6 @@ class MemoController extends ControllerBase
 
         $parameters["order"] = "id_documento DESC";
 
-        $memo = Memo::find($parameters);
-        if (count($memo) == 0) {
-            $this->flashSession->warning("<i class='fa fa-warning'></i> No se encontraron memo cargados en el sistema que coincidan con su búsqueda");
-            return $this->response->redirect('memo/index');
-        }
-
-        $paginator = new Paginator(array(
-            "data" => $memo,
-            "limit" => 10,
-            "page" => $numberPage
-        ));
-
-        $this->view->page = $paginator->getPaginate();
-    }
-
-    public function searchEntreFechasAction()
-    {
-        $this->setDatatables();
-        $this->view->pick('memo/search');
-        $numberPage = 1;
-
-        $rol = $this->session->get('auth')['rol_nombre'];
-        $limitarAnio = "";
-        if ($rol != "ADMINISTRADOR") {
-            $date = date_create(date('Y') . '-01-01');
-            $ultimoAno = date_format($date, "Y-m-d");//A pedido. los usuarios normales solo podrán ver los memo del ultimo año.
-            $limitarAnio = "  '$ultimoAno'  <= fecha AND ";
-        }
-        $desde = $this->request->getPost('fecha_desde');
-        $hasta = $this->request->getPost('fecha_hasta');
-        if ($this->request->isPost()) {
-
-            $query = Criteria::fromInput($this->di, "Memo", $_POST);
-            $this->persistent->parameters = $query->getParams();
-        } else {
-            $numberPage = $this->request->getQuery("page", "int");
-        }
-
-        $parameters = $this->persistent->parameters;
-        if (!is_array($parameters)) {
-            $parameters = array();
-        }
-        $parameters["order"] = "id_documento DESC";
-        if ($desde != null && $hasta != null) {
-            if (isset($parameters['conditions']))
-                $parameters['conditions'] .= " AND $limitarAnio  fecha BETWEEN '$desde' AND '$hasta'";
-            else
-                $parameters['conditions'] = "$limitarAnio  fecha BETWEEN '$desde' AND '$hasta'";
-        }
-        $memo = Memo::find($parameters);
-        if (count($memo) == 0) {
-            $this->flashSession->warning("<i class='fa fa-warning'></i> No se encontraron memo cargados en el sistema que coincidan con su búsqueda");
-            return $this->response->redirect('memo/index');
-        }
-
-        $paginator = new Paginator(array(
-            "data" => $memo,
-            "limit" => 10,
-            "page" => $numberPage
-        ));
-
-        $this->view->page = $paginator->getPaginate();
-    }
-
-
-    public function searchEntreNumerosAction()
-    {
-        $this->setDatatables();
-        $this->view->pick('memo/search');
-        $numberPage = 1;
-
-        $rol = $this->session->get('auth')['rol_nombre'];
-        $limitarAnio = "";
-        if ($rol != "ADMINISTRADOR") {
-            $date = date_create(date('Y') . '-01-01');
-            $ultimoAno = date_format($date, "Y-m-d");//A pedido. los usuarios normales solo podrán ver las memos del ultimo año.
-            $limitarAnio = " '$ultimoAno'  <= fecha AND ";
-        }
-        $desde = $this->request->getPost('nroInicial');
-        $hasta = $this->request->getPost('nroFinal');
-        if ($this->request->isPost()) {
-
-            $query = Criteria::fromInput($this->di, "Memo", $_POST);
-            $this->persistent->parameters = $query->getParams();
-        } else {
-            $numberPage = $this->request->getQuery("page", "int");
-        }
-
-        $parameters = $this->persistent->parameters;
-        if (!is_array($parameters)) {
-            $parameters = array();
-        }
-        $parameters["order"] = "id_documento DESC";
-
-        if ($desde != null && $hasta != null) {
-            if (isset($parameters['conditions']))
-                $parameters['conditions'] .= " AND $limitarAnio  nro_memo >= $desde AND nro_memo <= $hasta";
-            else
-                $parameters['conditions'] = "$limitarAnio  nro_memo >= $desde AND nro_memo <= $hasta";
-        }
         $memo = Memo::find($parameters);
         if (count($memo) == 0) {
             $this->flashSession->warning("<i class='fa fa-warning'></i> No se encontraron memo cargados en el sistema que coincidan con su búsqueda");
