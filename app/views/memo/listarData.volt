@@ -71,13 +71,13 @@
                     "data":           null,
                     "defaultContent": ''
                 },
-                { "data": "nro_memo",'searchable':true },
-                { "data": "fecha",'searchable':true  },
-                { "data": "origen",'searchable':true },
-                { "data": "destino",'searchable':true  },
-                { "data": "descripcion",'searchable':true  },
-                { "data": "habilitado","visible": false,'searchable':false },
-                { "data": "id_documento","visible": false,'searchable':false }
+                { "data": "nro_memo",'searchable':true, 'orderable':false },
+                { "data": "fecha",'searchable':true, 'orderable':false  },
+                { "data": "origen",'searchable':true, 'orderable':false },
+                { "data": "destino",'searchable':true, 'orderable':false  },
+                { "data": "descripcion",'searchable':true, 'orderable':false  },
+                { "data": "habilitado","visible": false,'searchable':false, 'orderable':false },
+                { "data": "id_documento","visible": false,'searchable':false, 'orderable':false }
             ]
         } );
         // Add event listener for opening and closing details

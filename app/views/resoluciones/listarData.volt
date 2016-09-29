@@ -53,6 +53,9 @@
     }
     $(document).ready(function() {
         var table = $('#example').DataTable( {
+            "search": {
+                "caseInsensitive": false
+            },
             "language": {
                 "url": "/libro/public/plugins/datatables/extensions/language/Spanish.json"
             },
@@ -69,12 +72,12 @@
                     "data":           null,
                     "defaultContent": ''
                 },
-                { "data": "nro_resolucion",'searchable':true },
-                { "data": "origen",'searchable':true },
-                { "data": "fecha",'searchable':true  },
-                { "data": "descripcion",'searchable':true  },
-                { "data": "habilitado","visible": false,'searchable':false },
-                { "data": "id_documento","visible": false,'searchable':false }
+                { "data": "nro_resolucion",'searchable':true, 'orderable':false },
+                { "data": "origen",'searchable':true, 'orderable':false },
+                { "data": "fecha",'searchable':true, 'orderable':false  },
+                { "data": "descripcion",'searchable':true, 'orderable':false  },
+                { "data": "habilitado","visible": false,'searchable':false, 'orderable':false },
+                { "data": "id_documento","visible": false,'searchable':false, 'orderable':false }
             ]
         } );
         // Add event listener for opening and closing details

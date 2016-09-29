@@ -71,13 +71,13 @@
                     "data":           null,
                     "defaultContent": ''
                 },
-                { "data": "nro_nota" ,'searchable':true },
-                { "data": "fecha",'searchable':true  },
-                { "data": "sector_nombre",'searchable':true },
-                { "data": "destino",'searchable':true  },
+                { "data": "nro_nota" ,'searchable':true, 'orderable':false },
+                { "data": "fecha",'searchable':true, 'orderable':false  },
+                { "data": "sector_nombre",'searchable':true, 'orderable':false },
+                { "data": "destino",'searchable':true, 'orderable':false  },
                 { "data": "descripcion",'searchable':true  },
-                { "data": "habilitado","visible": false,'searchable':false },
-                { "data": "id_documento","visible": false,'searchable':false }
+                { "data": "habilitado","visible": false,'searchable':false, 'orderable':false },
+                { "data": "id_documento","visible": false,'searchable':false, 'orderable':false }
             ]
         } );
         // Add event listener for opening and closing details

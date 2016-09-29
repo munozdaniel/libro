@@ -75,15 +75,15 @@
                     "data":           null,
                     "defaultContent": ''
                 },
-                { "data": "nro_expediente",'searchable':true },
-                { "data": "fecha",'searchable':true  },
-                { "data": "origen",'searchable':true },
-                { "data": "empresa",'searchable':true },
-                { "data": "letra",'searchable':true },
-                { "data": "anio",'searchable':true },
-                { "data": "descripcion",'searchable':true  },
-                { "data": "habilitado","visible": false,'searchable':false },
-                { "data": "id_documento","visible": false,'searchable':false }
+                { "data": "nro_expediente",'searchable':true, 'orderable':false },
+                { "data": "fecha",'searchable':true, 'orderable':false  },
+                { "data": "origen",'searchable':true, 'orderable':false },
+                { "data": "empresa",'searchable':true, 'orderable':false },
+                { "data": "letra",'searchable':true, 'orderable':false },
+                { "data": "anio",'searchable':true, 'orderable':false },
+                { "data": "descripcion",'searchable':true, 'orderable':false  },
+                { "data": "habilitado","visible": false,'searchable':false, 'orderable':false },
+                { "data": "id_documento","visible": false,'searchable':false, 'orderable':false }
             ]
         } );
         // Add event listener for opening and closing details
