@@ -439,9 +439,10 @@ class ExpedienteController extends ControllerBase
             $rol_id = $this->session->get('auth')['rol_id'];
             if($rol_id != 2 )
             {
+                //Los que no son ADMIN solo pueden ver los doc del ultimo año. Y los habilitados
                 $date = date_create(date('Y') . '-01-01');
                 $ultimoAnio = date_format($date, "Y-m-d");//A pedido. los usuarios normales solo podrán ver las expedientes del ultimo año.
-                $query->andWhere(" '$ultimoAnio' <= fecha ");
+                $query->andWhere(" '$ultimoAnio' <= fecha AND habilitado=1 ");
             }
             //var_dump($query->getParams());
             $this->persistent->parameters = $query->getParams();
