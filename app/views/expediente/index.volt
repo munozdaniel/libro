@@ -3,9 +3,6 @@
         <div class="nav-tabs-custom">
             <ul class="nav nav-tabs">
                 <li class="active"><a href="#busquedaGeneral" data-toggle="tab">Búsqueda General</a></li>
-                <li><a href="#porSectorYFecha" data-toggle="tab">Por Sector y Fechas </a></li>
-                <li><a href="#EntreFechas" data-toggle="tab">Entre Fechas</a></li>
-                <li><a href="#EntreNumeros" data-toggle="tab">Entre Números de Expedientes</a></li>
             </ul>
             <div class="tab-content">
                 <div class="active tab-pane" id="busquedaGeneral">
@@ -15,20 +12,23 @@
 
                     <div class="alert alert-info"><i class="fa fa-info-circle"></i> Ingrese únicamente los campos necesario. No son obligatorios</div>
                     <div class="form-group">
-                        <label for="nro_expediente" class="col-sm-2 control-label">Nro Expediente</label>
+                        <label for="nro_expediente_inicial" class="col-sm-2 control-label">Entre Números</label>
 
                         <div class="col-sm-4">
-                            {{ text_field('nro_expediente','class': 'form-control','placeholder':'Ingrese el Nro de Expediente') }}
+                            {{ text_field('nro_expediente_inicial','class': 'form-control','placeholder':'Nro de Expediente Inicial') }}
+                        </div>
+                        <div class="col-sm-4">
+                            {{ text_field('nro_expediente_final','class': 'form-control','placeholder':'Nro de Expediente Final') }}
                         </div>
                     </div>
 
                     <div class="form-group">
-                        {{ form.label('fecha',['class': 'col-sm-2 control-label']) }}
+                        <label for="fecha_inicial" class="col-sm-2 control-label">Entre Fechas</label>
                         <div class="col-sm-4">
-                            {{ form.render('fecha',['class': 'form-control']) }}
-                            <script>
-                                $('#fecha').prop("readOnly", false); // Quitamos el solo lectura.
-                            </script>
+                            {{ date_field('fecha_inicial','class': 'form-control ') }}
+                        </div>
+                        <div class="col-sm-4">
+                            {{ date_field('fecha_final','class': 'form-control ') }}
                         </div>
                     </div>
                     <div class="form-group">
@@ -36,6 +36,21 @@
                         <div class="col-sm-4">
                             {{ form.render('sector_id_oid',['class': 'form-control autocompletar']) }}
                         </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="expte_cod_letra" class="col-sm-2 control-label"> Código</label>
+                        <div class="col-sm-4">
+                            <input type="text" id="expte_cod_letra" name="expte_cod_letra"  class="form-control only-text user-success" placeholder="Ingrese una Letra" maxlength="1"  >
+                        </div>
+                        <script>
+                            $(".only-text").on('keyup', function(e) {
+                                var val = $(this).val();
+                                if (val.match(/[^a-zA-Z]/g)) {
+                                    $(this).val(val.replace(/[^a-zA-Z]/g, ''));
+                                }
+                            });
+                        </script>
                     </div>
                     <div class="form-group">
                         {{ form.label('descripcion',['class': 'col-sm-2 control-label']) }}
