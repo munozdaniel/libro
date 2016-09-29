@@ -403,7 +403,30 @@ class DisposicionController extends ControllerBase
         $this->setDatatables();
         $numberPage = 1;
         if ($this->request->isPost()) {
+            $_POST['descripcion'] = strtoupper($_POST['descripcion']);
+            if ($this->request->getPost('nro_disposicion_final', 'int') == null) {
+                $_POST['nro_disposicion']=$this->request->getPost('nro_disposicion_inicial', 'int');
+            }
+            if ($this->request->getPost('fecha_final') == null) {
+                $_POST['fecha']=$this->request->getPost('fecha_inicial');
+            }
             $query = Criteria::fromInput($this->di, "Disposicion", $_POST);
+            if ($this->request->getPost('nro_disposicion_final', 'int') != null
+                && $this->request->getPost('nro_disposicion_inicial', 'int') != null) {
+                $query->andWhere('nro_disposicion BETWEEN '. $this->request->getPost('nro_disposicion_inicial', 'int') ." AND ". $this->request->getPost('nro_disposicion_final', 'int'));
+            }
+            if ($this->request->getPost('fecha_final') != null) {
+                if($this->request->getPost('fecha_inicial') != null) {
+                    $query->betweenWhere('fecha', $this->request->getPost('fecha_inicial'), $this->request->getPost('fecha_final'));
+                }
+                else
+                {
+                    $this->flashSession->error("Verifique que la fecha inicial y final estén correctamente ingresadas");
+                    return $this->response->redirect('disposicion/index');
+                }
+            }
+
+            var_dump($query->getParams());
             $this->persistent->parameters = $query->getParams();
         } else {
             $numberPage = $this->request->getQuery("page", "int");
@@ -444,105 +467,6 @@ class DisposicionController extends ControllerBase
         $this->view->page = $paginator->getPaginate();
     }
 
-    public function searchEntreFechasAction()
-    {
-        $this->setDatatables();
-        $this->view->pick('disposicion/search');
-        $numberPage = 1;
-
-        $rol = $this->session->get('auth')['rol_nombre'];
-        $limitarAnio = "";
-        if ($rol != "ADMINISTRADOR") {
-            $date = date_create(date('Y') . '-01-01');
-            $ultimoAno = date_format($date, "Y-m-d");//A pedido. los usuarios normales solo podrán ver las disposiciones del ultimo año.
-            $limitarAnio = "  '$ultimoAno'  <= fecha AND ";
-        }
-        $desde = $this->request->getPost('fecha_desde');
-        $hasta = $this->request->getPost('fecha_hasta');
-        if ($this->request->isPost()) {
-
-            $query = Criteria::fromInput($this->di, "Disposicion", $_POST);
-            $this->persistent->parameters = $query->getParams();
-        } else {
-            $numberPage = $this->request->getQuery("page", "int");
-        }
-
-        $parameters = $this->persistent->parameters;
-        if (!is_array($parameters)) {
-            $parameters = array();
-        }
-        $parameters["order"] = "id_documento DESC";
-        if ($desde != null && $hasta != null) {
-            if (isset($parameters['conditions']))
-                $parameters['conditions'] .= " AND $limitarAnio  fecha BETWEEN '$desde' AND '$hasta'";
-            else
-                $parameters['conditions'] = "$limitarAnio  fecha BETWEEN '$desde' AND '$hasta'";
-        }
-        $disposicion = Disposicion::find($parameters);
-        if (count($disposicion) == 0) {
-            $this->flashSession->warning("<i class='fa fa-warning'></i> No se encontraron disposiciones cargadas en el sistema que coincidan con su búsqueda");
-            return $this->response->redirect('disposicion/index');
-        }
-
-        $paginator = new Paginator(array(
-            "data" => $disposicion,
-            "limit" => 10,
-            "page" => $numberPage
-        ));
-
-        $this->view->page = $paginator->getPaginate();
-    }
-
-
-    public function searchEntreNumerosAction()
-    {
-        $this->setDatatables();
-        $this->view->pick('disposicion/search');
-        $numberPage = 1;
-
-        $rol = $this->session->get('auth')['rol_nombre'];
-        $limitarAnio = "";
-        if ($rol != "ADMINISTRADOR") {
-            $date = date_create(date('Y') . '-01-01');
-            $ultimoAno = date_format($date, "Y-m-d");//A pedido. los usuarios normales solo podrán ver las disposiciones del ultimo año.
-            $limitarAnio = " '$ultimoAno'  <= fecha AND ";
-        }
-        $desde = $this->request->getPost('nroInicial');
-        $hasta = $this->request->getPost('nroFinal');
-        if ($this->request->isPost()) {
-
-            $query = Criteria::fromInput($this->di, "Disposicion", $_POST);
-            $this->persistent->parameters = $query->getParams();
-        } else {
-            $numberPage = $this->request->getQuery("page", "int");
-        }
-
-        $parameters = $this->persistent->parameters;
-        if (!is_array($parameters)) {
-            $parameters = array();
-        }
-        $parameters["order"] = "id_documento DESC";
-
-        if ($desde != null && $hasta != null) {
-            if (isset($parameters['conditions']))
-                $parameters['conditions'] .= " AND $limitarAnio  nro_disposicion >= $desde AND nro_disposicion <= $hasta";
-            else
-                $parameters['conditions'] = "$limitarAnio  nro_disposicion >= $desde AND nro_disposicion <= $hasta";
-        }
-        $disposicion = Disposicion::find($parameters);
-        if (count($disposicion) == 0) {
-            $this->flashSession->warning("<i class='fa fa-warning'></i> No se encontraron disposiciones cargadas en el sistema que coincidan con su búsqueda");
-            return $this->response->redirect('disposicion/index');
-        }
-
-        $paginator = new Paginator(array(
-            "data" => $disposicion,
-            "limit" => 10,
-            "page" => $numberPage
-        ));
-
-        $this->view->page = $paginator->getPaginate();
-    }
     /**
      * Listar Las Disposiciones
      */
