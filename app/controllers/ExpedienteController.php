@@ -378,32 +378,6 @@ class ExpedienteController extends ControllerBase
         return $this->response->redirect("expediente/listarData");
     }
 
-    /* ====================================================
-           BUSQUEDAS
-       =======================================================*/
-    public function listarAction()
-    {
-        $this->setDatatables();
-        $this->view->pick('expediente/search');
-
-
-        $numberPage = $this->request->getQuery("page", "int");
-        $parameters["order"] = "id_documento DESC";
-
-        $expediente = Expediente::find($parameters);
-        if (count($expediente) == 0) {
-            $this->flashSession->warning("<i class='fa fa-warning'></i> No se encontraron expedientes cargadas en el sistema");
-            return $this->response->redirect('expediente/index');
-        }
-
-        $paginator = new Paginator(array(
-            "data" => $expediente,
-            "limit" => 10,
-            "page" => $numberPage
-        ));
-
-        $this->view->page = $paginator->getPaginate();
-    }
 
     /**
      * Searches for expediente

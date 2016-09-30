@@ -227,44 +227,6 @@ class MemoController extends ControllerBase
 
     }
 
-    /**
-     * Deletes a memo
-     *
-     * @param string $id_documento
-     */
-    public function deleteAction($id_documento)
-    {
-
-        $memo = Memo::findFirstByid_documento($id_documento);
-        if (!$memo) {
-            $this->flash->error("memo was not found");
-
-            return $this->dispatcher->forward(array(
-                "controller" => "memo",
-                "action" => "index"
-            ));
-        }
-
-        if (!$memo->delete()) {
-
-            foreach ($memo->getMessages() as $message) {
-                $this->flash->error($message);
-            }
-
-            return $this->dispatcher->forward(array(
-                "controller" => "memo",
-                "action" => "search"
-            ));
-        }
-
-        $this->flash->success("memo was deleted successfully");
-
-        return $this->dispatcher->forward(array(
-            "controller" => "memo",
-            "action" => "index"
-        ));
-    }
-
     public function verAction($id_documento)
     {
         $this->assets->collection('headerCss')
@@ -382,47 +344,6 @@ class MemoController extends ControllerBase
             }
         }
         return $this->response->redirect("memo/listarData");
-    }
-
-    /* ====================================================
-           BUSQUEDAS
-       =======================================================*/
-    public function listarAction()
-    {
-        $this->setDatatables();
-        $this->view->pick('memo/search');
-
-
-        $numberPage = $this->request->getQuery("page", "int");
-        /*Control de visualizacion por rol*/
-        $rol = $this->session->get('auth')['rol_nombre'];
-        $limitarAnio = "";
-        if ($rol != "ADMINISTRADOR") {
-            $date = date_create(date('Y') . '-01-01');
-            $ultimoAno = date_format($date, "Y-m-d");//A pedido. los usuarios normales solo podrán ver los memos del ultimo año.
-            $limitarAnio = "  '$ultimoAno'  <= fecha ";
-        }
-        if (isset($parameters['conditions']))
-            if ($limitarAnio != "")
-                $parameters['conditions'] .= "AND $limitarAnio ";
-            else
-                if ($limitarAnio != "")
-                    $parameters['conditions'] = "$limitarAnio ";
-        $parameters["order"] = "id_documento DESC";
-
-        $memo = Memo::find($parameters);
-        if (count($memo) == 0) {
-            $this->flashSession->warning("<i class='fa fa-warning'></i> No se encontraron memo cargados en el sistema que coincidan con su búsqueda");
-            return $this->response->redirect('memo/index');
-        }
-
-        $paginator = new Paginator(array(
-            "data" => $memo,
-            "limit" => 10,
-            "page" => $numberPage
-        ));
-
-        $this->view->page = $paginator->getPaginate();
     }
 
     /**

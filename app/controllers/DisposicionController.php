@@ -368,33 +368,6 @@ class DisposicionController extends ControllerBase
         return $this->response->redirect("disposicion/listarData");
     }
 
-    /* ====================================================
-           BUSQUEDAS
-       =======================================================*/
-    public function listarAction()
-    {
-        $this->setDatatables();
-        $this->view->pick('disposicion/search');
-
-
-        $numberPage = $this->request->getQuery("page", "int");
-        $parameters["order"] = "id_documento DESC";
-
-        $disposicion = Disposicion::find($parameters);
-        if (count($disposicion) == 0) {
-            $this->flashSession->warning("<i class='fa fa-warning'></i> No se encontraron disposiciones cargadas en el sistema");
-            return $this->response->redirect('disposicion/index');
-        }
-
-        $paginator = new Paginator(array(
-            "data" => $disposicion,
-            "limit" => 10,
-            "page" => $numberPage
-        ));
-
-        $this->view->page = $paginator->getPaginate();
-    }
-
     /**
      * Searches for disposicion
      */
@@ -433,7 +406,7 @@ class DisposicionController extends ControllerBase
                 $ultimoAnio = date_format($date, "Y-m-d");//A pedido. los usuarios normales solo podrán ver las expedientes del ultimo año.
                 $query->andWhere(" '$ultimoAnio' <= fecha AND habilitado=1 ");
             }
-            var_dump($query->getParams());
+            //var_dump($query->getParams());
             $this->persistent->parameters = $query->getParams();
         } else {
             $numberPage = $this->request->getQuery("page", "int");
