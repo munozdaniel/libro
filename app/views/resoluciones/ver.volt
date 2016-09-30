@@ -56,12 +56,14 @@
                         {{ link_to('caratula/resoluciones/'~resolucion.getIdDocumento(),'<i class="fa fa-file"></i> Generar Caratula','class':'btn btn-flat btn-block btn-social btn-tumblr', 'target':'_blank') }}
                     </div>
                     {% if resolucion.getHabilitado()==1 %}
-                        <div class="form-group">
-                            {{ link_to('resoluciones/editar/'~resolucion.getIdDocumento(),'<i class="fa fa-pencil"></i> Editar resolucion','class':'btn btn-flat btn-block btn-social btn-twitter') }}
-                        </div>
-                        <div class="form-group">
-                            {{ link_to('resoluciones/eliminar/'~resolucion.getIdDocumento(),'<i class="fa fa-remove"></i> Eliminar resolucion','class':'btn btn-block btn-flat btn-social btn-google') }}
-                        </div>
+                        {% if session.get('auth')['rol_id'] == 5 or session.get('auth')['rol_id'] == 2 %}{#EMPLEADO#}
+                            <div class="form-group">
+                                {{ link_to('resoluciones/editar/'~resolucion.getIdDocumento(),'<i class="fa fa-pencil"></i> Editar resolucion','class':'btn btn-flat btn-block btn-social btn-twitter') }}
+                            </div>
+                            <div class="form-group">
+                                {{ link_to('resoluciones/eliminar/'~resolucion.getIdDocumento(),'<i class="fa fa-remove"></i> Eliminar resolucion','class':'btn btn-block btn-flat btn-social btn-google') }}
+                            </div>
+                        {% endif %}
                     {% else %}
                         <div class="form-group">
                             <a class="btn btn-flat btn-block btn-social btn-danger"><i class="fa fa-trash"></i> *** resolucion

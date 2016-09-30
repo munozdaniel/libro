@@ -42,12 +42,15 @@
                     {{ link_to('caratula/nota/'~nota.getIdDocumento(),'<i class="fa fa-file"></i> Generar Caratula','class':'btn btn-flat btn-block btn-social btn-tumblr', 'target':'_blank') }}
                 </div>
                 {% if nota.getHabilitado()==1 %}
-                    <div class="form-group">
-                        {{ link_to('nota/editar/'~nota.getIdDocumento(),'<i class="fa fa-pencil"></i> Editar Nota','class':'btn btn-flat btn-block btn-social btn-twitter') }}
-                    </div>
-                    <div class="form-group">
-                        {{ link_to('nota/eliminar/'~nota.getIdDocumento(),'<i class="fa fa-remove"></i> Eliminar Nota','class':'btn btn-block btn-flat btn-social btn-google') }}
-                    </div>
+                    {% if session.get('auth')['rol_id'] == 5 or session.get('auth')['rol_id'] == 2 %}{#EMPLEADO#}
+
+                        <div class="form-group">
+                            {{ link_to('nota/editar/'~nota.getIdDocumento(),'<i class="fa fa-pencil"></i> Editar Nota','class':'btn btn-flat btn-block btn-social btn-twitter') }}
+                        </div>
+                        <div class="form-group">
+                            {{ link_to('nota/eliminar/'~nota.getIdDocumento(),'<i class="fa fa-remove"></i> Eliminar Nota','class':'btn btn-block btn-flat btn-social btn-google') }}
+                        </div>
+                    {% endif %}
                 {% else %}
                     <div class="form-group">
                         <a class="btn btn-flat btn-block btn-social btn-danger"><i class="fa fa-trash"></i> *** NOTA
