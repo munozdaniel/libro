@@ -157,6 +157,7 @@
     </footer>
 
     <!-- Control Sidebar -->
+    {% if session.get('auth')['rol_id'] == 4 %}
     <aside class="control-sidebar control-sidebar-dark">
         <!-- Create the tabs -->
         <ul class="nav nav-tabs nav-justified control-sidebar-tabs">
@@ -220,6 +221,7 @@
             <!-- /.tab-pane -->
         </div>
     </aside>
+    {% endif %}
     <!-- /.control-sidebar -->
     <!-- Add the sidebar's background. This div must be placed
          immediately after the control sidebar -->
