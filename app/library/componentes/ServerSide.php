@@ -123,7 +123,7 @@ class ServerSide
                 $column = $columns[ $columnIdx ];
                 if ( $requestColumn['searchable'] == 'true' ) {
                     //$binding = ServerSide::bind( $bindings, '%'.$str.'%', PDO::PARAM_STR );
-                    $globalSearch[] = " ".$column['db']."  LIKE ". '\'%'.$str.'%\'';
+                    $globalSearch[] = " ".$column['db']."  LIKE ". '\'%'.strtoupper($str).'%\'';
                 }
 
             }
