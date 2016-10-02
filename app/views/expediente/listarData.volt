@@ -13,6 +13,8 @@
         background-image: none;
     }
 </style>
+{{ content() }}
+{{ flashSession.output() }}
 <table id="example" class="table-bordered display" cellspacing="0" width="100%">
     <thead>
     <tr>
