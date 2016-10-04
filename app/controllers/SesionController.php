@@ -37,11 +37,11 @@ class SesionController extends ControllerBase
                         //Redireccionar la ejecución si el usuario es valido
                         return $this->redireccionar('nota/listarData');
                     } else {
-                        $this->flash->message('aviso', "<p>EL USUARIO NO TIENE LOS ROLES NECESARIOS PARA ADMINISTRAR</p>");
+                        $this->flash->error("EL USUARIO NO TIENE LOS PERMISOS NECESARIOS PARA ADMINISTRAR. COMUNIQUESE CON EL EQUIPO DE DESARROLLO");
                         return $this->redireccionar('index/index');
                     }
                 } else {
-                    $this->flash->message('problema', "<p>No se encontro el Usuario, verifique contraseña/nick</p>");
+                    $this->flash->error( "No se encontró el USUARIO, verifique contraseña/nick");
                 }
             } catch (\Phalcon\Annotations\Exception $ex) {
                 $this->flash->error($ex->getMessage());
