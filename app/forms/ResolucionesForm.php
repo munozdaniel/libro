@@ -54,7 +54,7 @@ class ResolucionesForm extends Form{
                 $opcion['required'] => '',
                 "readOnly" => 'true'
             ));
-        $elemento->setLabel($opcion['asterisco'] . ' Nro de Nota');
+        $elemento->setLabel($opcion['asterisco'] . ' Nro de Resolución');
         $elemento->setFilters(array('int'));
         $this->add($elemento);
         /*========================== FECHA ==========================*/
@@ -83,6 +83,14 @@ class ResolucionesForm extends Form{
                             AND S.sector_id=D.detalleSector_sectorId ')
             ->getQuery()
             ->execute();
+
+        $sectores = Sectores::query()
+            ->columns("Sectores.sector_id, Sectores.sector_nombre")
+            ->join("DetalleSector") //This should work without a condition if you defined a relation between Robots and Manufacturers
+            ->where("DetalleSector.detalleSector_resolucion=1 AND Sectores.sector_id=DetalleSector.detalleSector_sectorId")
+            ->execute();
+
+
         $elemento = new Select('sector_id_oid', $sectores, array(
             'using' => array('sector_id', 'sector_nombre'),
             'useEmpty' => true,

@@ -56,7 +56,7 @@ class DisposicionForm extends Form
                 $opcion['required'] => '',
                 "readOnly" => 'true'
             ));
-        $elemento->setLabel($opcion['asterisco'] . ' Nro de Nota');
+        $elemento->setLabel($opcion['asterisco'] . ' Nro de Disposicion');
         $elemento->setFilters(array('int'));
         $this->add($elemento);
         /*========================== FECHA ==========================*/

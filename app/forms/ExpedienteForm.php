@@ -56,7 +56,7 @@ class ExpedienteForm extends Form
                 $opcion['required'] => '',
                 "readOnly" => 'true'
             ));
-        $elemento->setLabel($opcion['asterisco'] . ' Nro de Nota');
+        $elemento->setLabel($opcion['asterisco'] . ' Nro de Expediente');
         $elemento->setFilters(array('int'));
         $this->add($elemento);
         /*========================== FECHA ==========================*/
