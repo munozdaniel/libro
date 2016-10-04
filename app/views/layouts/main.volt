@@ -122,9 +122,15 @@
                             </span>
                     </a>
                     <ul class="treeview-menu">
-                        <li>{{ link_to('disposicion/listarData','<i class="fa fa-circle-o "></i> <span>Listado</span>') }}</li>
-                        <li>{{ link_to('disposicion/new','<i class="fa fa-circle-o "></i> <span>Nuevo</span>') }}</li>
-                        <li>{{ link_to('disposicion/index','<i class="fa fa-circle-o "></i> <span>Buscar</span>') }}</li>
+                        {% if session.get('auth')['rol_id'] == 3 %}{#EMPLEADO#}
+                            <li><a style="border: 1px dashed darkgray; color:darkgray;"><i class="fa fa-circle-o "></i> <span>Listado</span></a></li>
+                            <li><a  style="border: 1px dashed darkgray; color:darkgray;"><i class="fa fa-circle-o "></i> <span>Nuevo</span></a></li>
+                            <li><a  style="border: 1px dashed darkgray; color:darkgray;"><i class="fa fa-circle-o "></i> <span>Buscar</span></a></li>
+                        {% else %}
+                            <li>{{ link_to('disposicion/listarData','<i class="fa fa-circle-o "></i> <span>Listado</span>') }}</li>
+                            <li>{{ link_to('disposicion/new','<i class="fa fa-circle-o "></i> <span>Nuevo</span>') }}</li>
+                            <li>{{ link_to('disposicion/index','<i class="fa fa-circle-o "></i> <span>Buscar</span>') }}</li>
+                        {% endif %}
                     </ul>
                 </li>
                 <li class="treeview ">
