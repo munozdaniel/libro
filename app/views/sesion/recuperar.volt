@@ -14,10 +14,12 @@
             <span class="glyphicon glyphicon-envelope form-control-feedback"></span>
         </div>
         <div class="row">
+            <div class="col-xs-4 pull-left">
+                {{ link_to('index','class':'btn btn-default btn-block btn-flat pull-left','<i class="fa fa-home"></i> Volver') }}
+            </div>
             <div class="col-xs-4 pull-right">
                 <button type="submit" class="btn btn-primary btn-block btn-flat">Recuperar</button>
             </div>
-            <!-- /.col -->
         </div>
         {{ end_form() }}
 
