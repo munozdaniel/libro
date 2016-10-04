@@ -41,3 +41,10 @@
 #Archivos Personales
 public/temp/
 cache/
+app/cache/
+.phalcon/
+app/library/mpdf/
+app/migrations/
+public/css/
+public/files/
+public/js/
