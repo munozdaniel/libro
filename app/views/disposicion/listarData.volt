@@ -95,6 +95,14 @@
                 tr.addClass('shown');
             }
         } );
+        var myVar = setInterval(function () {
+            myTimer()
+        }, 120000);
 
+        function myTimer() {
+            //  tabla.ajax.reload();
+            table.ajax.reload(null, false); // user paging is not reset on reload
+
+        }
     } );
 </script>
