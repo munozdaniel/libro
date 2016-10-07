@@ -76,7 +76,10 @@ class NotaForm extends Form {
         ));
         $this->add($elemento);
         /*========================== SECTOR ORIGEN ==========================*/
-        $elemento = new Select('nota_sectorOrigenId',  Sectores::find(array('sector_activo=1 AND sector_id!=1')), array(
+        $elemento = new Select('nota_sectorOrigenId',  Sectores::find(
+            array('sector_activo=1 AND sector_id!=1',
+                "order" => "sector_nombre ASC")),
+            array(
             'using'      => array('sector_id', 'sector_nombre'),
             'useEmpty'   => true,
             'emptyText'  => 'Seleccionar ',

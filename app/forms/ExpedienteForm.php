@@ -83,6 +83,7 @@ class ExpedienteForm extends Form
             ->where(' S.sector_activo=1 AND  S.sector_id!=1
                         AND D.detalleSector_expediente=1
                             AND S.sector_id=D.detalleSector_sectorId ')
+            ->orderBy("S.sector_nombre ASC")
             ->getQuery()
             ->execute();
         $elemento = new Select('sector_id_oid', $sectores, array(

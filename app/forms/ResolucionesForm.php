@@ -81,6 +81,7 @@ class ResolucionesForm extends Form{
             ->where(' S.sector_activo=1 AND  S.sector_id!=1
                         AND D.detalleSector_resolucion=1
                             AND S.sector_id=D.detalleSector_sectorId ')
+            ->orderBy("S.sector_nombre ASC")
             ->getQuery()
             ->execute();
 
