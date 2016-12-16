@@ -6,17 +6,17 @@ set_time_limit(300);
 return new \Phalcon\Config(array(
     'database' => array(
         'adapter'     => 'Mysql',
-        'host'        => 'localhost',
+        'host'        => '172.16.10.34',
         'username'    => 'root',
-        'password'    => '',
-        'dbname'      => 'libro',
+        'password'    => 'infoimps',
+        'dbname'      => 'libro_phalcon',
         'charset'     => 'utf8',
     ),
     'gestionusuarios' => array(
         'adapter'     => 'Mysql',
-        'host'        => 'localhost',
+        'host'        => '172.16.10.34',
         'username'    => 'root',
-        'password'    => '',
+        'password'    => 'infoimps',
         'dbname'      => 'gestionusuarios',
         'charset'     => 'utf8',
     ),
