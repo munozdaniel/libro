@@ -113,54 +113,54 @@ class MemoController extends ControllerBase
             }
             $memo->setNroMemo($ultimo->getNroMemo() + 1);
             $memo->setUltimo(1);
-            /*Validamos el formulario*/
-            if (!$form->isValid()) {
-                $this->db->rollback();
-                foreach ($form->getMessages() as $message) {
-                    $this->flash->error($message);
-                }
-                return $this->redireccionar('memo/new');
-            }
-            /*Seteamos los campos faltantes*/
-            $memo->setHabilitado(1);
-            $memo->setDescripcion(mb_strtoupper($memo->getDescripcion()));
-
-            if ($memo->getDestinosectorIdOid() == 1)
-                if (trim($this->request->getPost('otrodestino')) != "")
-                    $memo->setOtrodestino(mb_strtoupper($this->request->getPost('otrodestino')));
-                else {
-                    $this->flash->error("Ingrese otro destino");
-                    $form->clear(array('destinosector_id_oid'));
-                    return $this->redireccionar('memo/new');
-                }
-            else
-                $memo->setOtrodestino(null);
-            $memo->setTipo(2);
-            /*Guardamos el adjunto*/
-            $archivos = $this->request->getUploadedFiles();
-            if ($archivos[0]->getName() != "") {
-                $nombreCarpeta = 'files/memo/' . date('Ymd') . '/' . $memo->getNroMemo();
-                $path = $this->guardarAdjunto($archivos, $nombreCarpeta);
-                if ($path == "") {
-                    $this->flashSession->error("Edite el memo para volver a adjuntar el archivo.");
-                } else {
-                    $memo->setMemoAdjunto($path);
-                }
-            }
-            /*Guardamos la instancia en la bd*/
-            if ($memo->save() == false) {
-                $this->db->rollback();
-                foreach ($memo->getMessages() as $message) {
-                    $this->flash->error($message);
-                }
-                return $this->redireccionar('memo/new');
-            }
-
-            $form->clear();
-            $this->db->commit();
-            $this->flashSession->success("El Memo ha sido creado correctamente");
-            return $this->response->redirect('memo/listarData');
         }
+        /*Validamos el formulario*/
+        if (!$form->isValid()) {
+            $this->db->rollback();
+            foreach ($form->getMessages() as $message) {
+                $this->flash->error($message);
+            }
+            return $this->redireccionar('memo/new');
+        }
+        /*Seteamos los campos faltantes*/
+        $memo->setHabilitado(1);
+        $memo->setDescripcion(mb_strtoupper($memo->getDescripcion()));
+        if ($memo->getDestinosectorIdOid() == 1)
+            if (trim($this->request->getPost('otrodestino')) != "")
+                $memo->setOtrodestino(mb_strtoupper($this->request->getPost('otrodestino')));
+            else {
+                $this->flash->error("Ingrese otro destino");
+                $form->clear(array('destinosector_id_oid'));
+                return $this->redireccionar('memo/new');
+            }
+        else
+            $memo->setOtrodestino(null);
+        $memo->setTipo(2);
+        /*Guardamos el adjunto*/
+        $archivos = $this->request->getUploadedFiles();
+        if ($archivos[0]->getName() != "") {
+            $nombreCarpeta = 'files/memo/' . date('Ymd') . '/' . $memo->getNroMemo();
+            $path = $this->guardarAdjunto($archivos, $nombreCarpeta);
+            if ($path == "") {
+                $this->flashSession->error("Edite el memo para volver a adjuntar el archivo.");
+            } else {
+                $memo->setMemoAdjunto($path);
+            }
+        }
+        /*Guardamos la instancia en la bd*/
+        if ($memo->save() == false) {
+            $this->db->rollback();
+            foreach ($memo->getMessages() as $message) {
+                $this->flash->error($message);
+            }
+            return $this->redireccionar('memo/new');
+        }
+
+        $form->clear();
+        $this->db->commit();
+        $this->flashSession->success("El Memo ha sido creado correctamente");
+        return $this->response->redirect('memo/listarData');
+
     }
 
     /**
