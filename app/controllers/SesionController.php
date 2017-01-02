@@ -32,7 +32,7 @@ class SesionController extends ControllerBase
 
                 if ($usuarios != false) {
                     if ($this->_registrarSesion($usuarios)) {
-                        $miSesion = $this->session->get('auth');
+                        $miSesion = $this->session->get('auth_libro');
                         $this->flash->notice("Bienvenido/a " . $miSesion['usuario_nombreCompleto']);
                         //Redireccionar la ejecución si el usuario es valido
                         return $this->redireccionar('nota/listarData');
@@ -63,7 +63,7 @@ class SesionController extends ControllerBase
         else {
             $rol = Rol::findFirstByRolId($idRol->rol_id);
 
-            $this->session->set('auth', array('usuario_id' => $usuario->usuario_id,
+            $this->session->set('auth_libro', array('usuario_id' => $usuario->usuario_id,
                 'usuario_nombreCompleto' => $usuario->usuario_nombreCompleto,
                 'usuario_nick' => $usuario->usuario_nick,
                 'rol_nombre' => $rol->rol_nombre,
@@ -82,7 +82,7 @@ class SesionController extends ControllerBase
     {
         $this->tag->setTitle('Cerrando Sesión');
 
-        $this->session->remove('auth');
+        $this->session->remove('auth_libro');
         $this->flash->success('Se ha cerrado la sesión.');
         return $this->redireccionar("index/index");
     }
