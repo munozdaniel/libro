@@ -102,7 +102,12 @@ $di->set('flashSession', function()
  * Start the session the first time some component request the session service
  */
 $di->setShared('session', function () {
-    $session = new SessionAdapter();
+    $session = new SessionAdapter(
+        [
+            "uniqueId" => "libro",
+        ]
+    );
+    $session->setOptions(array('max_execution_time'=>300));
     $session->start();
 
     return $session;
